@@ -10,6 +10,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import study.br1221.productivitytimer.R;
@@ -18,10 +19,10 @@ import study.br1221.productivitytimer.R;
  * TODO: document your custom view class.
  */
 public class TimerView extends View {
-    int arcWidth = 40;
-    Paint backgroundArcPaint, foregroundArcPaint;
-    RectF arcRect;
-    Path arcPath;
+    private int arcWidth = 40;
+    private Paint backgroundArcPaint, foregroundArcPaint;
+    private RectF arcRect;
+    private int timerAngle = 0;
 
 
 
@@ -53,22 +54,31 @@ public class TimerView extends View {
         foregroundArcPaint.setStrokeCap(Paint.Cap.ROUND);
         foregroundArcPaint.setStrokeWidth(arcWidth);
 
-        arcRect = new RectF(0 + 100, 0 + 100, getWidth() - 100, getHeight() - 100);
 
-        arcPath = new Path();
+
+
+
     }
 
 
     @Override
     protected void onDraw(Canvas canvas) {
 
+        arcRect = new RectF(100, 100, getWidth() - 100, getHeight() - 100);
+        Path arcPath = new Path();
         arcPath.arcTo(arcRect, 135, 270);
         canvas.drawPath(arcPath, backgroundArcPaint);
 
+        Path timerArcPath = new Path();
+        timerArcPath.arcTo(arcRect, 135, timerAngle);
+        canvas.drawPath(timerArcPath, foregroundArcPaint);
+
     }
 
-    public void setTime(){
+    public void setTime(double millis){
+        timerAngle =(int) (270 * (100 / (60000/millis) / 100));
+        invalidate();
+
 
     }
-
 }

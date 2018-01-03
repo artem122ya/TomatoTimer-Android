@@ -27,9 +27,9 @@ import static java.lang.Thread.sleep;
 public class TimerService extends Service {
 
     public static String ACTION_SEND_TIME = "time_send";
-    public static String STRING_TIME = "time_extra_string";
+    public static String LONG_TIME_MILLIS = "time_extra_millis";
 
-    private boolean isBound = false;
+    private long stopTime;
 
 
     private enum TimerState {STARTED, PAUSED, STOPPED}
@@ -40,7 +40,7 @@ public class TimerService extends Service {
 
     int timerNotificationId = 135001;
 
-    TimerActionReceiver actionReceiver = new TimerActionReceiver();
+    private TimerActionReceiver actionReceiver = new TimerActionReceiver();
 
     private final IBinder iBinder = new LocalBinder();
 
@@ -57,13 +57,11 @@ public class TimerService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        isBound = true;
         return iBinder;
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        isBound = false;
         return super.onUnbind(intent);
     }
 
@@ -91,6 +89,7 @@ public class TimerService extends Service {
 
     public void startTimer(){
         thisTimerService = this;
+        stopTime = System.currentTimeMillis() + 60000;
         synchronized (timerThread) {
             if (timerState == TimerState.STOPPED) {
                 timerState = TimerState.STARTED;
@@ -131,9 +130,9 @@ public class TimerService extends Service {
 
 
 
-    private void sendTime(String timeStr){
+    private void sendTime(long timeMillis){
         Intent intent = new Intent(ACTION_SEND_TIME);
-        intent.putExtra(STRING_TIME, timeStr);
+        intent.putExtra(LONG_TIME_MILLIS, timeMillis);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -173,10 +172,10 @@ public class TimerService extends Service {
             synchronized (timerThread) {
                 while (timerState == TimerState.STARTED) {
 
-                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                    String time = sdf.format(new Date());
-                    sendTime(time);
-                    outputNotification(time);
+                    long timeMillisLeft = stopTime - System.currentTimeMillis();
+
+                    sendTime(timeMillisLeft);
+                    outputNotification(String.valueOf(timeMillisLeft));
                     try {
                         timerThread.wait(1000);
                     } catch (InterruptedException e) {

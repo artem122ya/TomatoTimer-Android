@@ -16,13 +16,16 @@ import android.widget.TextView;
 
 import java.sql.Time;
 
+import study.br1221.productivitytimer.views.TimerView;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    TextView remainingTimeTv;
-    Button start, stop, pause;
+    private TextView remainingTimeTv;
+    private Button start, stop, pause;
 
-    TimerService timerService;
-    boolean timerServiceBound = false;
+    private TimerService timerService;
+
+    private TimerView timerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         stop.setOnClickListener(this);
         pause.setOnClickListener(this);
 
-
+        timerView = (TimerView) findViewById(R.id.timerView);
     }
 
     @Override
@@ -70,7 +73,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private BroadcastReceiver onEvent = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent intent) {
-            remainingTimeTv.setText(intent.getStringExtra(TimerService.STRING_TIME));
+            long timeMillis = intent.getLongExtra(TimerService.LONG_TIME_MILLIS, 0);
+            remainingTimeTv.setText(String.valueOf(timeMillis));
+            timerView.setTime((double)timeMillis);
+
         }
     };
 
@@ -79,12 +85,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             timerService = ((TimerService.LocalBinder) iBinder).getService();
-            timerServiceBound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            timerServiceBound = false;
         }
     };
 
