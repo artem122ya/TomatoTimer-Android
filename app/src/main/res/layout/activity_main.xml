@@ -32,4 +32,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="pause" />
+
+    <study.br1221.productivitytimer.views.TimerView
+        android:layout_width="300dp"
+        android:layout_height="300dp" />
+
 </LinearLayout>
