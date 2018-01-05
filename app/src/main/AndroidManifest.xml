@@ -32,6 +32,8 @@
                 <action android:name="com.example.app.ACTION_TIMER_STOP" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>
