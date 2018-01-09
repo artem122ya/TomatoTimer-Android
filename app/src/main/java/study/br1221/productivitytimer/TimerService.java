@@ -9,8 +9,10 @@ import android.content.Context;
 import android.content.Intent;
 
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -27,7 +29,8 @@ import static java.lang.Thread.sleep;
 public class TimerService extends Service {
 
     public static String ACTION_SEND_TIME = "time_send";
-    public static String LONG_TIME_MILLIS = "time_extra_millis";
+    public static String INT_TIME_MILLIS_LEFT = "time_extra_millis_left";
+    public static String INT_TIME_MILLIS_TOTAL = "time_extra_millis_total";
 
     private long stopTime;
 
@@ -45,6 +48,8 @@ public class TimerService extends Service {
     private final IBinder iBinder = new LocalBinder();
 
     public static TimerService thisTimerService;
+
+    private int totalMillis = -1;
 
 
     public class LocalBinder extends Binder {
@@ -88,8 +93,12 @@ public class TimerService extends Service {
     }
 
     public void startTimer(){
+
+        if (totalMillis == -1) totalMillis = getTotalMillis();
+
         thisTimerService = this;
-        stopTime = System.currentTimeMillis() + 60000;
+        stopTime = System.currentTimeMillis() + totalMillis;
+
         synchronized (timerThread) {
             if (timerState == TimerState.STOPPED) {
                 timerState = TimerState.STARTED;
@@ -129,10 +138,18 @@ public class TimerService extends Service {
     }
 
 
+    public int getTotalMillis(){
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-    private void sendTime(long timeMillis){
+        return sharedPrefs.getInt("timer_minutes", 0) * 60000;
+    }
+
+
+
+    private void sendTime(int totalMillis, int millisLeft){
         Intent intent = new Intent(ACTION_SEND_TIME);
-        intent.putExtra(LONG_TIME_MILLIS, timeMillis);
+        intent.putExtra(INT_TIME_MILLIS_LEFT, millisLeft);
+        intent.putExtra(INT_TIME_MILLIS_TOTAL, totalMillis);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -174,7 +191,7 @@ public class TimerService extends Service {
 
                     long timeMillisLeft = stopTime - System.currentTimeMillis();
 
-                    sendTime(timeMillisLeft);
+                    sendTime(totalMillis,(int) timeMillisLeft);
                     outputNotification(String.valueOf(timeMillisLeft));
                     try {
                         timerThread.wait(1000);

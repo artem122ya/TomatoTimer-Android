@@ -103,10 +103,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private BroadcastReceiver onEvent = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent intent) {
-            long timeMillis = intent.getLongExtra(TimerService.LONG_TIME_MILLIS, 0);
-            remainingTimeTv.setText(String.valueOf(timeMillis));
-            timerView.setTime((double)timeMillis);
-
+            int timeMillisLeft = intent.getIntExtra(TimerService.INT_TIME_MILLIS_LEFT, 0);
+            int timeMillisTotal = intent.getIntExtra(TimerService.INT_TIME_MILLIS_TOTAL, 0);
+            remainingTimeTv.setText(String.valueOf(timeMillisLeft));
+            timerView.setTime(timeMillisTotal, timeMillisLeft);
         }
     };
 
