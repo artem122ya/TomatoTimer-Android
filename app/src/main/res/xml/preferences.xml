@@ -2,7 +2,14 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto">
 
+    <PreferenceCategory android:title="Schedule" >
+        <study.br1221.productivitytimer.MinutePickerDialogPreference
+            android:key="timer_minutes"
+            android:title="Give me a number"
+            android:defaultValue="55"
+            android:summary="Current value"/>
 
+    </PreferenceCategory>
 
 
 
