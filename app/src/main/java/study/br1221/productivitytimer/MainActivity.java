@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.sql.Time;
+import java.util.concurrent.TimeUnit;
 
 import study.br1221.productivitytimer.views.TimerView;
 
@@ -105,10 +106,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void onReceive(Context ctxt, Intent intent) {
             int timeMillisLeft = intent.getIntExtra(TimerService.INT_TIME_MILLIS_LEFT, 0);
             int timeMillisTotal = intent.getIntExtra(TimerService.INT_TIME_MILLIS_TOTAL, 0);
-            remainingTimeTv.setText(String.valueOf(timeMillisLeft));
+            remainingTimeTv.setText(getTimeString(timeMillisLeft));
             timerView.setTime(timeMillisTotal, timeMillisLeft);
         }
     };
+
+    private String getTimeString(int millis){
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+        return String.format("%02d:%02d",
+                minutes,TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(minutes));
+    }
 
 
     private ServiceConnection serviceConnection = new ServiceConnection() {

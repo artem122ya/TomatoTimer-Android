@@ -4,11 +4,28 @@
 
     <PreferenceCategory android:title="Schedule" >
         <study.br1221.productivitytimer.MinutePickerDialogPreference
-            android:key="timer_minutes"
-            android:title="Give me a number"
-            android:defaultValue="55"
+            android:key="focus_time_minutes"
+            android:title="focus time"
+            android:defaultValue="25"
             android:summary="Current value"/>
 
+        <study.br1221.productivitytimer.MinutePickerDialogPreference
+            android:key="small_break_time_minutes"
+            android:title="small break"
+            android:defaultValue="5"
+            android:summary="Current value"/>
+
+        <study.br1221.productivitytimer.MinutePickerDialogPreference
+            android:key="big_break_time_minutes"
+            android:title="big break"
+            android:defaultValue="15"
+            android:summary="Current value"/>
+
+        <study.br1221.productivitytimer.MinutePickerDialogPreference
+            android:key="sessions_until_big_break"
+            android:title="sessions until big break"
+            android:defaultValue="4"
+            android:summary="Current value"/>
     </PreferenceCategory>
 
 

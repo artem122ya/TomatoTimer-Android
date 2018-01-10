@@ -32,14 +32,15 @@ public class TimerService extends Service {
     public static String INT_TIME_MILLIS_LEFT = "time_extra_millis_left";
     public static String INT_TIME_MILLIS_TOTAL = "time_extra_millis_total";
 
-    private long stopTime;
+
 
 
     private enum TimerState {STARTED, PAUSED, STOPPED}
     private volatile TimerState timerState = TimerState.STOPPED;
 
 
-    private Thread timerThread = new Thread(new TimerRunnable());
+    private Thread timerThread;
+    private final Object timerThreadLock = new Object();
 
     int timerNotificationId = 135001;
 
@@ -49,8 +50,15 @@ public class TimerService extends Service {
 
     public static TimerService thisTimerService;
 
-    private int totalMillis = -1;
 
+
+    private enum PeriodStates {FOCUS, BREAK, BIG_BREAK, NOT_INITIALIZED}
+    private PeriodStates currentPeriod = PeriodStates.NOT_INITIALIZED;
+
+    private int timeMillisLeft = 0;
+    private long timeMillisStarted = 0;
+    private int totalMillis = 0;
+    private long stopTimeMillis = 0;
 
     public class LocalBinder extends Binder {
         TimerService getService() {
@@ -75,15 +83,18 @@ public class TimerService extends Service {
 
         thisTimerService = this;
 
+        createIntentFilter();
+
+        return START_STICKY;
+    }
+
+    private void createIntentFilter(){
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
         intentFilter.addAction("com.example.app.ACTION_TIMER_START");
         intentFilter.addAction("com.example.app.ACTION_TIMER_PAUSE");
         intentFilter.addAction("com.example.app.ACTION_TIMER_STOP");
         registerReceiver(actionReceiver, intentFilter);
-
-
-        return START_STICKY;
     }
 
     @Override
@@ -94,59 +105,103 @@ public class TimerService extends Service {
 
     public void startTimer(){
 
-        if (totalMillis == -1) totalMillis = getTotalMillis();
+
+
 
         thisTimerService = this;
-        stopTime = System.currentTimeMillis() + totalMillis;
 
-        synchronized (timerThread) {
+        synchronized (timerThreadLock) {
             if (timerState == TimerState.STOPPED) {
+                timeMillisStarted = System.currentTimeMillis();
+                totalMillis = getTimeLeftMillis();
+                timeMillisLeft = totalMillis;
+                stopTimeMillis = timeMillisStarted + totalMillis;
+
+                timerThread = new Thread(new TimerRunnable());
                 timerState = TimerState.STARTED;
                 timerThread.start();
             } else if (timerState == TimerState.PAUSED) {
                 timerState = TimerState.STARTED;
-                timerThread.notifyAll();
+                timerThreadLock.notifyAll();
             }
         }
     }
 
 
     public void pauseTimer() {
-        synchronized (timerThread) {
+        synchronized (timerThreadLock) {
             if (timerState != TimerState.PAUSED) {
                 timerState = TimerState.PAUSED;
-                timerThread.notify();
+                timerThreadLock.notifyAll();
             }
         }
     }
 
     public void stopTimer() {
-
-        if (timerState != TimerState.STOPPED) {
-            synchronized (timerThread) {
+        synchronized (timerThreadLock) {
+            if (timerState != TimerState.STOPPED) {
                 timerState = TimerState.STOPPED;
-                timerThread.notifyAll();
+                timerThreadLock.notifyAll();
             }
-            try {
-                timerThread.join();
-            } catch (InterruptedException e) {
+        }
 
-            }
-            timerThread = new Thread(new TimerRunnable());
+        try {
+            timerThread.join();
+        } catch (InterruptedException e) {
+
+        }
+        startForeground(0, null);
+
+
+    }
+
+    private int getTimeLeftMillis(){
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int timeLeft = 0;
+        switch (currentPeriod){
+            case NOT_INITIALIZED:
+
+            case FOCUS:
+                timeLeft = sharedPrefs.getInt("focus_time_minutes", 25);
+                break;
+            case BREAK:
+                timeLeft = sharedPrefs.getInt("small_break_time_minutes", 5);
+                break;
+            case BIG_BREAK:
+                timeLeft = sharedPrefs.getInt("big_break_period_minutes", 15);
+                break;
+        }
+        return timeLeft*60000;
+
+    }
+
+
+
+
+    private void initTimer(){
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int focusPeriodMillis = sharedPrefs.getInt("focus_time_minutes", 25) * 60000;
+        int smallBreakPeriodMillis = sharedPrefs.getInt("small_break_time_minutes", 5) * 60000;
+        int bigBreakPeriodMillis = sharedPrefs.getInt("big_break_period_minutes", 15) * 60000;
+        int sessionsUntilBreak = sharedPrefs.getInt("sessions_until_big_break", 0);
+
+
+        switch (currentPeriod){
+            case NOT_INITIALIZED:
+
+            case FOCUS:
+
+            case BREAK:
+
+            case BIG_BREAK:
         }
 
     }
 
 
-    public int getTotalMillis(){
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        return sharedPrefs.getInt("timer_minutes", 0) * 60000;
-    }
-
-
 
     private void sendTime(int totalMillis, int millisLeft){
+        /* Method sends total time and time left in milliseconds */
         Intent intent = new Intent(ACTION_SEND_TIME);
         intent.putExtra(INT_TIME_MILLIS_LEFT, millisLeft);
         intent.putExtra(INT_TIME_MILLIS_TOTAL, totalMillis);
@@ -186,25 +241,29 @@ public class TimerService extends Service {
     private class TimerRunnable implements Runnable {
         @Override
         public void run() {
-            synchronized (timerThread) {
+            synchronized (timerThreadLock) {
                 while (timerState == TimerState.STARTED) {
 
-                    long timeMillisLeft = stopTime - System.currentTimeMillis();
+                    timeMillisLeft = (int)(stopTimeMillis - System.currentTimeMillis());
 
-                    sendTime(totalMillis,(int) timeMillisLeft);
+                    sendTime(totalMillis, timeMillisLeft);
                     outputNotification(String.valueOf(timeMillisLeft));
+                    if(timeMillisLeft <= 500){
+                        stopTimer();
+                    }
+
                     try {
-                        timerThread.wait(1000);
+                        timerThreadLock.wait(1000);
                     } catch (InterruptedException e) {
 
                     }
                     while (timerState == TimerState.PAUSED) {
                         try {
-                            timerThread.wait();
+                            timerThreadLock.wait();
                         } catch (InterruptedException e) {
 
                         }
-
+                        stopTimeMillis = System.currentTimeMillis() + timeMillisLeft;
                     }
                 }
             }
