@@ -130,7 +130,7 @@ public class TimerService extends Service {
 
     public void pauseTimer() {
         synchronized (timerThreadLock) {
-            if (timerState != TimerState.PAUSED) {
+            if (timerState == TimerState.STARTED) {
                 timerState = TimerState.PAUSED;
                 timerThreadLock.notifyAll();
             }
@@ -138,19 +138,22 @@ public class TimerService extends Service {
     }
 
     public void stopTimer() {
-        synchronized (timerThreadLock) {
-            if (timerState != TimerState.STOPPED) {
-                timerState = TimerState.STOPPED;
-                timerThreadLock.notifyAll();
-            }
-        }
 
+    if (timerState != TimerState.STOPPED) {
+        synchronized (timerThreadLock) {
+            timerState = TimerState.STOPPED;
+            timerThreadLock.notifyAll();
+        }
         try {
             timerThread.join();
         } catch (InterruptedException e) {
 
         }
         startForeground(0, null);
+
+    }
+
+
 
 
     }
@@ -248,7 +251,7 @@ public class TimerService extends Service {
 
                     sendTime(totalMillis, timeMillisLeft);
                     outputNotification(String.valueOf(timeMillisLeft));
-                    if(timeMillisLeft <= 500){
+                    if(timeMillisLeft <= 0){
                         stopTimer();
                     }
 

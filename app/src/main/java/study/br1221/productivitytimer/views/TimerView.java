@@ -21,7 +21,7 @@ import study.br1221.productivitytimer.R;
 
 public class TimerView extends View {
     private int arcWidth;
-    private Paint backgroundArcPaint, foregroundArcPaint;
+    private Paint backgroundArcPaint, foregroundArcPaint, timerTextPaint;
     private RectF arcRect;
     private int viewWidth, viewHeight;
 
@@ -30,6 +30,8 @@ public class TimerView extends View {
     private Path backgroundArcPath, foregroundArcPath;
 
     private Context context;
+
+    private Rect viewRect = new Rect();
 
 
 
@@ -84,6 +86,9 @@ public class TimerView extends View {
         foregroundArcPaint.setStyle(Paint.Style.STROKE);
         foregroundArcPaint.setStrokeCap(Paint.Cap.ROUND);
 
+        timerTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        timerTextPaint.setColor(Color.BLACK);
+
     }
 
     private void applyAttrs(TypedArray a){
@@ -105,31 +110,27 @@ public class TimerView extends View {
         canvas.drawPath(backgroundArcPath, backgroundArcPaint);
         canvas.drawPath(foregroundArcPath, foregroundArcPaint);
 
-        //--------------
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(Color.BLACK);
+        drawTimeText(canvas);
 
-
-        float den = getContext().getResources().getDisplayMetrics().density;
-
-        float px = viewWidth/ 6;
-
-        paint.setTextSize(px);
-
-        drawCenter(canvas, paint, "11:00");
 
     }
 
-    private Rect r = new Rect();
+
+    private void drawTimeText(Canvas canvas){
+        float pixelTextSize = viewWidth/ 6;
+        timerTextPaint.setTextSize(pixelTextSize);
+        drawCenter(canvas, timerTextPaint, "11:00");
+    }
+
 
     private void drawCenter(Canvas canvas, Paint paint, String text) {
-        canvas.getClipBounds(r);
-        int cHeight = r.height();
-        int cWidth = r.width();
+        canvas.getClipBounds(viewRect);
+        int cHeight = viewRect.height();
+        int cWidth = viewRect.width();
         paint.setTextAlign(Paint.Align.LEFT);
-        paint.getTextBounds(text, 0, text.length(), r);
-        float x = cWidth / 2f - r.width() / 2f - r.left;
-        float y = cHeight / 2f + r.height() / 2f - r.bottom;
+        paint.getTextBounds(text, 0, text.length(), viewRect);
+        float x = cWidth / 2f - viewRect.width() / 2f - viewRect.left;
+        float y = cHeight / 2f + viewRect.height() / 2f - viewRect.bottom;
         canvas.drawText(text, x, y, paint);
     }
 
@@ -157,7 +158,19 @@ public class TimerView extends View {
     }
 
     public void setTime(int timeMillisTotal, int timeMillisLeft){
-        anglePercentage = (float) timeMillisLeft / (float) timeMillisTotal;
+        anglePercentage = timeMillisLeft > 0 ? (float) timeMillisLeft / (float) timeMillisTotal : 0;
         invalidate();
     }
+
+//    private static class TimerThread implements Runnable {
+//
+//        @Override
+//        public void run() {
+//
+//
+//        }
+//        public void setTime(int timeMillisTotal, int timeMillisLeft){
+//
+//        }
+//    }
 }
