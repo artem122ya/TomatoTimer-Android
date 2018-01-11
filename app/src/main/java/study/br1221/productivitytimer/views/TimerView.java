@@ -1,5 +1,6 @@
 package study.br1221.productivitytimer.views;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
@@ -33,6 +34,10 @@ public class TimerView extends View {
 
     private Rect viewRect = new Rect();
 
+    private float arcSweepAngle;
+
+    private Thread animationThread;
+    private AnimationRunnable animationRunnable;
 
 
 
@@ -59,6 +64,20 @@ public class TimerView extends View {
         int width = getMeasuredWidth();
         if (height > width) setMeasuredDimension(width, width);
         else setMeasuredDimension(height, height);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        animationRunnable = new AnimationRunnable();
+        animationThread = new Thread(animationRunnable);
+        animationThread.start();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        animationRunnable.stopRunning();
     }
 
     private void init(Context context, AttributeSet attrs) {
@@ -149,7 +168,7 @@ public class TimerView extends View {
 
         //create foreground arc
         foregroundArcPath = new Path();
-        foregroundArcPath.arcTo(arcRect, 135, 270 * anglePercentage);
+        foregroundArcPath.arcTo(arcRect, 135, arcSweepAngle);
 
         //set dynamic arcWidth
         arcWidth = viewWidth / 22;
@@ -157,20 +176,66 @@ public class TimerView extends View {
         foregroundArcPaint.setStrokeWidth(arcWidth);
     }
 
-    public void setTime(int timeMillisTotal, int timeMillisLeft){
-        anglePercentage = timeMillisLeft > 0 ? (float) timeMillisLeft / (float) timeMillisTotal : 0;
-        invalidate();
+    private void setSweepAngle(float angle){
+        arcSweepAngle = angle;
+        postInvalidate();
     }
 
-//    private static class TimerThread implements Runnable {
+    public void setTime(int timeMillisTotal, int timeMillisLeft){
+
+        int oldSweepAngle = (int) (270 * anglePercentage);
+        anglePercentage = timeMillisLeft > 0 ? (float) timeMillisLeft / (float) timeMillisTotal : 0;
+        int newSweepAngle = (int) (270 * anglePercentage);
+
+
+        animationRunnable.setAngles(oldSweepAngle, newSweepAngle);
+
+
+    }
+
+    private class AnimationRunnable implements Runnable {
+        float oldSweepAngle = 0f;
+        int newSweepAngle = 0;
+        boolean running = true;
+        Object lock = new Object();
+
+        @Override
+        public void run() {
+            synchronized (lock) {
+                while (running) {
+                    oldSweepAngle -= 0.3;
+                    setSweepAngle(oldSweepAngle);
+                    try {
+                        lock.wait(50);
+                    } catch (InterruptedException e) {
+
+                    }
+//                    if (oldSweepAngle <= newSweepAngle) {
+//                        try {
+//                            lock.wait();
+//                        } catch (InterruptedException e) {
 //
-//        @Override
-//        public void run() {
-//
-//
-//        }
-//        public void setTime(int timeMillisTotal, int timeMillisLeft){
-//
-//        }
-//    }
+//                        }
+//                    }
+
+
+                }
+            }
+        }
+        public void setAngles(int oldSweepAngle, int newSweepAngle){
+            synchronized (lock) {
+                this.oldSweepAngle = oldSweepAngle;
+                this.newSweepAngle = newSweepAngle;
+                lock.notifyAll();
+            }
+        }
+        public void stopRunning(){
+            synchronized (lock){
+                running = false;
+                lock.notifyAll();
+            }
+
+
+        }
+    }
 }
