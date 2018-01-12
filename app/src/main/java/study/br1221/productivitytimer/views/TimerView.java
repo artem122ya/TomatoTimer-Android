@@ -2,7 +2,6 @@ package study.br1221.productivitytimer.views;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,16 +9,13 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
-import android.preference.PreferenceManager;
-import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
+
+import java.util.concurrent.TimeUnit;
 
 import study.br1221.productivitytimer.R;
 
-import static java.lang.Math.abs;
 
 
 public class TimerView extends View {
@@ -32,16 +28,17 @@ public class TimerView extends View {
 
     private Path backgroundArcPath, foregroundArcPath;
 
-    private Context context;
 
     private Rect viewRect = new Rect();
 
     private int initialArcSweepAngle = 270;
+    private int initialArcStartAngle = 135;
 
     private float arcSweepAngle;
 
-    private Thread animationThread;
-    private AnimationRunnable animationRunnable;
+    private ValueAnimator arcAnimator;
+
+    private String currentTimerString = "00:00";
 
 
 
@@ -71,22 +68,9 @@ public class TimerView extends View {
         else setMeasuredDimension(height, height);
     }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        animationRunnable = new AnimationRunnable();
-        animationThread = new Thread(animationRunnable);
-        animationThread.start();
-    }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        animationRunnable.stopRunning();
-    }
 
     private void init(Context context, AttributeSet attrs) {
-        this.context = context;
         createPaint();
 
 
@@ -143,7 +127,7 @@ public class TimerView extends View {
     private void drawTimeText(Canvas canvas){
         float pixelTextSize = viewWidth/ 6;
         timerTextPaint.setTextSize(pixelTextSize);
-        drawCenter(canvas, timerTextPaint, "11:00");
+        drawCenter(canvas, timerTextPaint, currentTimerString);
     }
 
 
@@ -164,16 +148,16 @@ public class TimerView extends View {
         viewWidth = getWidth();
         viewHeight = getHeight();
 
-        //create arc rect
+        //create arc rect with 100px margin
         arcRect = new RectF(100, 100, viewWidth - 100, viewHeight - 100);
 
         //create background arc
         backgroundArcPath = new Path();
-        backgroundArcPath.arcTo(arcRect, 135, 270);
+        backgroundArcPath.arcTo(arcRect, initialArcStartAngle, initialArcSweepAngle);
 
         //create foreground arc
         foregroundArcPath = new Path();
-        foregroundArcPath.arcTo(arcRect, 135, arcSweepAngle);
+        foregroundArcPath.arcTo(arcRect, initialArcStartAngle, arcSweepAngle);
 
         //set dynamic arcWidth
         arcWidth = viewWidth / 22;
@@ -181,76 +165,47 @@ public class TimerView extends View {
         foregroundArcPaint.setStrokeWidth(arcWidth);
     }
 
-    private void setSweepAngle(float angle){
+    private void setArcSweepAngle(float angle){
         arcSweepAngle = angle;
         postInvalidate();
     }
 
+    boolean startedAnimating = false;
     public void setTime(int timeMillisTotal, int timeMillisLeft){
 
-        int oldSweepAngle = (int) (270 * anglePercentage);
         anglePercentage = timeMillisLeft > 0 ? (float) timeMillisLeft / (float) timeMillisTotal : 0;
-        int newSweepAngle = (int) (270 * anglePercentage);
+        float newSweepAngle =  initialArcSweepAngle * anglePercentage;
+
+        setCurrentTimerString(getTimeString(timeMillisLeft));
 
 
-        animationRunnable.setAngles(oldSweepAngle, newSweepAngle);
-
-
+        if(!startedAnimating) animateArc(timeMillisLeft, newSweepAngle);
+        startedAnimating = true;
     }
 
-    private class AnimationRunnable implements Runnable {
-        float oldSweepAngle = initialArcSweepAngle;
-        int newSweepAngle = initialArcSweepAngle;
-        boolean running = true;
-        Object lock = new Object();
-
-        @Override
-        public void run() {
-            synchronized (lock) {
-                while (running) {
-                    oldSweepAngle -= 0.077;
-                    setSweepAngle(oldSweepAngle);
-                    try {
-                        lock.wait(16);
-                    } catch (InterruptedException e) {
-
-                    }
-                    if (oldSweepAngle <= newSweepAngle) {
-                        try {
-                            lock.wait();
-                        } catch (InterruptedException e) {
-
-                        }
-                    }
-
-
-                }
+    private void animateArc(int durationMillis, float startingAngle){
+        arcAnimator = ValueAnimator.ofFloat(startingAngle, 0);
+        arcAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator updatedAnimation) {
+                float animatedValue = (float)updatedAnimation.getAnimatedValue();
+                setArcSweepAngle(animatedValue);
             }
-        }
-        public void setAngles(int oldSweepAngle, int newSweepAngle){
-            synchronized (lock) {
-//                if(Math.abs(this.oldSweepAngle - oldSweepAngle) > initialArcSweepAngle / 50) {
-//                    this.oldSweepAngle = oldSweepAngle;
-//                }
-                this.newSweepAngle = newSweepAngle;
-                lock.notifyAll();
-            }
-        }
-
-        public void startRunning(){
-            synchronized (lock){
-                running = true;
-                lock.notifyAll();
-            }
-        }
-
-        public void stopRunning(){
-            synchronized (lock){
-                running = false;
-                lock.notifyAll();
-            }
-
-
-        }
+        });
+        arcAnimator.setDuration(durationMillis);
+        arcAnimator.start();
     }
+
+    private void setCurrentTimerString(String currentTime){
+        currentTimerString = currentTime;
+    }
+
+
+    private String getTimeString(int millis){
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+        return String.format("%02d:%02d",
+                minutes,TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(minutes));
+    }
+
+
 }
