@@ -31,7 +31,8 @@ public class TimerService extends Service {
     public static String ACTION_SEND_TIME = "time_send";
     public static String INT_TIME_MILLIS_LEFT = "time_extra_millis_left";
     public static String INT_TIME_MILLIS_TOTAL = "time_extra_millis_total";
-
+    public static String BOOLEAN_TIMER_PAUSED = "timer_paused";
+    public static String BOOLEAN_TIMER_STOPPED = "timer_stopped";
 
 
 
@@ -111,9 +112,6 @@ public class TimerService extends Service {
             moveToNextPeriod();
         }
 
-
-
-
         thisTimerService = this;
 
         synchronized (timerThreadLock) {
@@ -172,6 +170,7 @@ public class TimerService extends Service {
 
     public void pauseTimer() {
         synchronized (timerThreadLock) {
+            sendPauseIntent();
             if (timerState == TimerState.STARTED) {
                 timerState = TimerState.PAUSED;
                 timerThreadLock.notifyAll();
@@ -192,7 +191,7 @@ public class TimerService extends Service {
 
         }
         startForeground(0, null);
-
+        sendStopIntent();
     }
 
 
@@ -228,6 +227,18 @@ public class TimerService extends Service {
         Intent intent = new Intent(ACTION_SEND_TIME);
         intent.putExtra(INT_TIME_MILLIS_LEFT, millisLeft);
         intent.putExtra(INT_TIME_MILLIS_TOTAL, totalMillis);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void sendPauseIntent(){
+        Intent intent = new Intent(ACTION_SEND_TIME);
+        intent.putExtra(BOOLEAN_TIMER_PAUSED, true);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void sendStopIntent(){
+        Intent intent = new Intent(ACTION_SEND_TIME);
+        intent.putExtra(BOOLEAN_TIMER_STOPPED, true);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

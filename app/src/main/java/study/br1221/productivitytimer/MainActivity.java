@@ -103,13 +103,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private BroadcastReceiver onEvent = new BroadcastReceiver() {
-        public void onReceive(Context ctxt, Intent intent) {
+        public void onReceive(Context context, Intent intent) {
             int timeMillisLeft = intent.getIntExtra(TimerService.INT_TIME_MILLIS_LEFT, 0);
             int timeMillisTotal = intent.getIntExtra(TimerService.INT_TIME_MILLIS_TOTAL, 0);
+            boolean timerStopped = intent.getBooleanExtra(TimerService.BOOLEAN_TIMER_STOPPED, false);
+            boolean timerPaused = intent.getBooleanExtra(TimerService.BOOLEAN_TIMER_PAUSED, false);
+            updateTimerView(timerStopped, timerPaused, timeMillisTotal, timeMillisLeft);
+
+
             remainingTimeTv.setText(getTimeString(timeMillisLeft));
-            timerView.setTime(timeMillisTotal, timeMillisLeft);
+
         }
     };
+
+
+    private void updateTimerView(boolean timerStopped, boolean timerPaused, int millisTotal, int millisLeft){
+        if(timerPaused){
+            timerView.stopAnimation();
+        } else if(timerStopped){
+            timerView.setTime(0, 0);
+            timerView.stopAnimation();
+        } else timerView.setTime(millisTotal, millisLeft);
+
+    }
 
     private String getTimeString(int millis){
         long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);

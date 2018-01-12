@@ -1,5 +1,6 @@
 package study.br1221.productivitytimer.views;
 
+import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,6 +11,7 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import java.util.concurrent.TimeUnit;
@@ -37,6 +39,7 @@ public class TimerView extends View {
     private float arcSweepAngle;
 
     private ValueAnimator arcAnimator;
+    boolean animating = false;
 
     private String currentTimerString = "00:00";
 
@@ -167,20 +170,25 @@ public class TimerView extends View {
 
     private void setArcSweepAngle(float angle){
         arcSweepAngle = angle;
+        Log.d("timerview", "setArcSweepAngle" + String.valueOf(angle));
         postInvalidate();
     }
 
-    boolean startedAnimating = false;
+
     public void setTime(int timeMillisTotal, int timeMillisLeft){
 
         anglePercentage = timeMillisLeft > 0 ? (float) timeMillisLeft / (float) timeMillisTotal : 0;
         float newSweepAngle =  initialArcSweepAngle * anglePercentage;
+        Log.d("timerview", "setTime" + String.valueOf(newSweepAngle));
 
         setCurrentTimerString(getTimeString(timeMillisLeft));
 
 
-        if(!startedAnimating) animateArc(timeMillisLeft, newSweepAngle);
-        startedAnimating = true;
+        if (!animating){
+            animateArc(timeMillisLeft, newSweepAngle);
+            animating = true;
+        }
+
     }
 
     private void animateArc(int durationMillis, float startingAngle){
@@ -192,8 +200,21 @@ public class TimerView extends View {
                 setArcSweepAngle(animatedValue);
             }
         });
+        arcAnimator.setInterpolator(new TimeInterpolator() {
+            @Override
+            public float getInterpolation(float v) {
+                return v;
+            }
+        });
         arcAnimator.setDuration(durationMillis);
         arcAnimator.start();
+    }
+
+
+
+    public void stopAnimation(){
+        arcAnimator.cancel();
+        animating = false;
     }
 
     private void setCurrentTimerString(String currentTime){
