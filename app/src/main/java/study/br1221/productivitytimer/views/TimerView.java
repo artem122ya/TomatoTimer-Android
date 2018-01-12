@@ -19,6 +19,8 @@ import android.view.View;
 
 import study.br1221.productivitytimer.R;
 
+import static java.lang.Math.abs;
+
 
 public class TimerView extends View {
     private int arcWidth;
@@ -34,10 +36,13 @@ public class TimerView extends View {
 
     private Rect viewRect = new Rect();
 
+    private int initialArcSweepAngle = 270;
+
     private float arcSweepAngle;
 
     private Thread animationThread;
     private AnimationRunnable animationRunnable;
+
 
 
 
@@ -194,8 +199,8 @@ public class TimerView extends View {
     }
 
     private class AnimationRunnable implements Runnable {
-        float oldSweepAngle = 0f;
-        int newSweepAngle = 0;
+        float oldSweepAngle = initialArcSweepAngle;
+        int newSweepAngle = initialArcSweepAngle;
         boolean running = true;
         Object lock = new Object();
 
@@ -203,7 +208,7 @@ public class TimerView extends View {
         public void run() {
             synchronized (lock) {
                 while (running) {
-                    oldSweepAngle -= 0.07;
+                    oldSweepAngle -= 0.077;
                     setSweepAngle(oldSweepAngle);
                     try {
                         lock.wait(16);
@@ -224,11 +229,21 @@ public class TimerView extends View {
         }
         public void setAngles(int oldSweepAngle, int newSweepAngle){
             synchronized (lock) {
-                this.oldSweepAngle = oldSweepAngle;
+//                if(Math.abs(this.oldSweepAngle - oldSweepAngle) > initialArcSweepAngle / 50) {
+//                    this.oldSweepAngle = oldSweepAngle;
+//                }
                 this.newSweepAngle = newSweepAngle;
                 lock.notifyAll();
             }
         }
+
+        public void startRunning(){
+            synchronized (lock){
+                running = true;
+                lock.notifyAll();
+            }
+        }
+
         public void stopRunning(){
             synchronized (lock){
                 running = false;
