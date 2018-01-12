@@ -54,6 +54,8 @@ public class TimerService extends Service {
 
     private enum PeriodStates {FOCUS, BREAK, BIG_BREAK, NOT_INITIALIZED}
     private PeriodStates currentPeriod = PeriodStates.NOT_INITIALIZED;
+    private int consecutiveFocusPeriod = 0;
+    private int periodsUntilBreak = 3;
 
     private int timeMillisLeft = 0;
     private long timeMillisStarted = 0;
@@ -105,6 +107,10 @@ public class TimerService extends Service {
 
     public void startTimer(){
 
+        if (timerState != TimerState.PAUSED){
+            moveToNextPeriod();
+        }
+
 
 
 
@@ -125,6 +131,42 @@ public class TimerService extends Service {
                 timerThreadLock.notifyAll();
             }
         }
+    }
+
+
+    private void moveToNextPeriod(){
+        switch (currentPeriod){
+            case NOT_INITIALIZED:
+                setPeriodToFocus();
+                break;
+            case FOCUS:
+                if (consecutiveFocusPeriod >= periodsUntilBreak){
+                    setPeriodToBigBreak();
+                } else {
+                    setPeriodToBreak();
+                }
+                break;
+            case BREAK:
+                setPeriodToFocus();
+                break;
+            case BIG_BREAK:
+                setPeriodToFocus();
+                break;
+        }
+    }
+
+    private void setPeriodToFocus(){
+        currentPeriod = PeriodStates.FOCUS;
+        consecutiveFocusPeriod++;
+    }
+
+    private void setPeriodToBreak(){
+        currentPeriod = PeriodStates.BREAK;
+    }
+
+    private void setPeriodToBigBreak(){
+        currentPeriod = PeriodStates.BIG_BREAK;
+        consecutiveFocusPeriod = 0;
     }
 
 
@@ -178,28 +220,6 @@ public class TimerService extends Service {
 
     }
 
-
-
-
-    private void initTimer(){
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        int focusPeriodMillis = sharedPrefs.getInt("focus_time_minutes", 25) * 60000;
-        int smallBreakPeriodMillis = sharedPrefs.getInt("small_break_time_minutes", 5) * 60000;
-        int bigBreakPeriodMillis = sharedPrefs.getInt("big_break_period_minutes", 15) * 60000;
-        int sessionsUntilBreak = sharedPrefs.getInt("sessions_until_big_break", 0);
-
-
-        switch (currentPeriod){
-            case NOT_INITIALIZED:
-
-            case FOCUS:
-
-            case BREAK:
-
-            case BIG_BREAK:
-        }
-
-    }
 
 
 
