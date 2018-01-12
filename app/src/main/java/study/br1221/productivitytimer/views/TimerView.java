@@ -203,20 +203,20 @@ public class TimerView extends View {
         public void run() {
             synchronized (lock) {
                 while (running) {
-                    oldSweepAngle -= 0.3;
+                    oldSweepAngle -= 0.07;
                     setSweepAngle(oldSweepAngle);
                     try {
-                        lock.wait(50);
+                        lock.wait(16);
                     } catch (InterruptedException e) {
 
                     }
-//                    if (oldSweepAngle <= newSweepAngle) {
-//                        try {
-//                            lock.wait();
-//                        } catch (InterruptedException e) {
-//
-//                        }
-//                    }
+                    if (oldSweepAngle <= newSweepAngle) {
+                        try {
+                            lock.wait();
+                        } catch (InterruptedException e) {
+
+                        }
+                    }
 
 
                 }
