@@ -7,6 +7,13 @@
     android:orientation="vertical"
     tools:context="study.br1221.productivitytimer.MainActivity">
 
+    <study.br1221.productivitytimer.views.TimerView
+        android:id="@+id/timerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:background_arc_color="@color/colorBlack"
+        app:foreground_arc_color="@color/colorWhite" />
+
     <TextView
         android:id="@+id/remainingTimeTv"
         android:layout_width="wrap_content"
@@ -34,12 +41,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="pause" />
-
-    <study.br1221.productivitytimer.views.TimerView
-        android:id="@+id/timerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:background_arc_color="@color/colorBlack"
-        app:foreground_arc_color="@color/colorWhite" />
 
 </LinearLayout>

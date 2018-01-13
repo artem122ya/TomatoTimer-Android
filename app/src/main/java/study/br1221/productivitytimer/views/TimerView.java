@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -104,6 +105,8 @@ public class TimerView extends View {
 
         timerTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         timerTextPaint.setColor(Color.BLACK);
+        timerTextPaint.setTypeface(Typeface.createFromAsset(getContext().getAssets(),
+                "fonts/Roboto-Regular.ttf"));
 
     }
 
@@ -312,9 +315,7 @@ public class TimerView extends View {
     }
 
     public void updateTimer(int millisTotal, int millisLeft){
-
         setTime(millisTotal, millisLeft);
-
     }
 
 }

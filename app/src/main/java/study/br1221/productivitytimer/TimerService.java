@@ -321,7 +321,6 @@ public class TimerService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-
             if(action.equalsIgnoreCase("com.example.app.ACTION_TIMER_START")){
                 if(thisTimerService != null) thisTimerService.startTimer();
             } else if(action.equalsIgnoreCase("com.example.app.ACTION_TIMER_PAUSE")){
