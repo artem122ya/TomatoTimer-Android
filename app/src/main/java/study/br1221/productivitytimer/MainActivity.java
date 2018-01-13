@@ -138,8 +138,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void initializeTimerView(){
-        int initialTimeMillis = timerService.getTimeLeftMillis(timerService.getNextPeriod());
-        updateTimerView(false,false, false, initialTimeMillis, initialTimeMillis);
+        updateTimerView(false,false, false,
+                timerService.getMillisTotal(), timerService.getMillisLeft());
     }
 
 

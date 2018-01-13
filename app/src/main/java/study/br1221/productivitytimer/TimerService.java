@@ -214,6 +214,18 @@ public class TimerService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
+    public int getMillisLeft(){
+        if (timerState == TimerState.STOPPED) {
+            return getTimeLeftMillis(getNextPeriod());
+        } else return timeMillisLeft;
+    }
+
+    public int getMillisTotal(){
+        if (timerState == TimerState.STOPPED) {
+            return getTimeLeftMillis(getNextPeriod());
+        } else return totalMillis;
+    }
+
     private void sendStartIntent() {
         Intent intent = new Intent(ACTION_SEND_TIME);
         intent.putExtra(BOOLEAN_TIMER_STARTED, true);
@@ -286,7 +298,7 @@ public class TimerService extends Service {
                     }
 
                     try {
-                        timerThreadLock.wait(1000);
+                        timerThreadLock.wait(995);
                     } catch (InterruptedException e) {
 
                     }

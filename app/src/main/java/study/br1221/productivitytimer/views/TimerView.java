@@ -48,7 +48,7 @@ public class TimerView extends View {
     private enum TimerState {STARTED, PAUSED, STOPPED}
     private volatile TimerState timerState = TimerState.STOPPED;
 
-
+    private boolean firstDraw = true;
 
 
     public TimerView(Context context) {
@@ -182,30 +182,14 @@ public class TimerView extends View {
 
     public void setTime(int timeMillisTotal, int timeMillisLeft){
         stopDrawAnimation();
-        float newSweepAngle;
         switch (timerState){
             case STARTED:
-                if (!animatingTimer){
-                    stopDrawAnimation();
-                    timeMillisLeft = timeMillisLeft <= 0 ? 0 : timeMillisLeft - animationDrawDuration;
-                    newSweepAngle = getNewSweepAngle(timeMillisTotal, timeMillisLeft);
-                    animateDrawArc(animationDrawDuration, newSweepAngle);
-                    animateArc(timeMillisLeft,animationDrawDuration, newSweepAngle);
-                    animatingTimer = true;
-                }
+                drawWhenStarted(timeMillisTotal, timeMillisLeft);
                 break;
             case PAUSED:
-
-
             case STOPPED:
-                if (animatingTimer){
-                    stopDrawAnimation();
-                    stopAnimation();
-                    animatingTimer = false;
-                }
-                newSweepAngle = getNewSweepAngle(timeMillisTotal, timeMillisLeft);
-                animateDrawArc(animationDrawDuration, newSweepAngle);
-
+                drawWhenStopped(timeMillisTotal, timeMillisLeft);
+                break;
         }
 
         setCurrentTimerString(getTimeString(timeMillisLeft));
@@ -213,7 +197,28 @@ public class TimerView extends View {
     }
 
 
+    private void drawWhenStarted(int timeMillisTotal, int timeMillisLeft){
+        if (!animatingTimer){
+            timeMillisLeft = timeMillisLeft <= 0 ? 0 : timeMillisLeft - animationDrawDuration;
+            float newSweepAngle = getNewSweepAngle(timeMillisTotal, timeMillisLeft);
+            animateDrawArc(animationDrawDuration, newSweepAngle);
+            animateArc(timeMillisLeft, animationDrawDuration, newSweepAngle);
+            animatingTimer = true;
+        }
+    }
 
+
+    private void drawWhenStopped(int timeMillisTotal, int timeMillisLeft){
+        if (animatingTimer){
+            stopAnimation();
+            animatingTimer = false;
+        }
+        float newSweepAngle = getNewSweepAngle(timeMillisTotal, timeMillisLeft);
+        if (firstDraw){
+            setArcSweepAngle(newSweepAngle);
+            firstDraw = false;
+        } else animateDrawArc(animationDrawDuration, newSweepAngle);
+    }
 
 
     private float getNewSweepAngle(int millisTotal, int millisLeft){
