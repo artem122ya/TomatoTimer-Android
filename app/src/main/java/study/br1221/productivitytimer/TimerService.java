@@ -33,7 +33,7 @@ public class TimerService extends Service {
     public static String INT_TIME_MILLIS_TOTAL = "time_extra_millis_total";
     public static String BOOLEAN_TIMER_PAUSED = "timer_paused";
     public static String BOOLEAN_TIMER_STOPPED = "timer_stopped";
-
+    public static String BOOLEAN_TIMER_STARTED = "timer_started";
 
 
     private enum TimerState {STARTED, PAUSED, STOPPED}
@@ -53,8 +53,8 @@ public class TimerService extends Service {
 
 
 
-    private enum PeriodStates {FOCUS, BREAK, BIG_BREAK, NOT_INITIALIZED}
-    private PeriodStates currentPeriod = PeriodStates.NOT_INITIALIZED;
+    private enum PeriodState {FOCUS, BREAK, BIG_BREAK, NOT_INITIALIZED}
+    private PeriodState currentPeriod = PeriodState.NOT_INITIALIZED;
     private int consecutiveFocusPeriod = 0;
     private int periodsUntilBreak = 3;
 
@@ -117,14 +117,17 @@ public class TimerService extends Service {
         synchronized (timerThreadLock) {
             if (timerState == TimerState.STOPPED) {
                 timeMillisStarted = System.currentTimeMillis();
-                totalMillis = getTimeLeftMillis();
+                totalMillis = getTimeLeftMillis(currentPeriod);
                 timeMillisLeft = totalMillis;
                 stopTimeMillis = timeMillisStarted + totalMillis;
+
+                sendStartIntent();
 
                 timerThread = new Thread(new TimerRunnable());
                 timerState = TimerState.STARTED;
                 timerThread.start();
             } else if (timerState == TimerState.PAUSED) {
+                sendStartIntent();
                 timerState = TimerState.STARTED;
                 timerThreadLock.notifyAll();
             }
@@ -133,39 +136,15 @@ public class TimerService extends Service {
 
 
     private void moveToNextPeriod(){
-        switch (currentPeriod){
-            case NOT_INITIALIZED:
-                setPeriodToFocus();
-                break;
-            case FOCUS:
-                if (consecutiveFocusPeriod >= periodsUntilBreak){
-                    setPeriodToBigBreak();
-                } else {
-                    setPeriodToBreak();
-                }
-                break;
-            case BREAK:
-                setPeriodToFocus();
-                break;
-            case BIG_BREAK:
-                setPeriodToFocus();
-                break;
+        currentPeriod = getNextPeriod();
+        if (currentPeriod == PeriodState.FOCUS){
+            consecutiveFocusPeriod++;
+        } else if (currentPeriod == PeriodState.BIG_BREAK){
+            consecutiveFocusPeriod = 0;
         }
     }
 
-    private void setPeriodToFocus(){
-        currentPeriod = PeriodStates.FOCUS;
-        consecutiveFocusPeriod++;
-    }
 
-    private void setPeriodToBreak(){
-        currentPeriod = PeriodStates.BREAK;
-    }
-
-    private void setPeriodToBigBreak(){
-        currentPeriod = PeriodStates.BIG_BREAK;
-        consecutiveFocusPeriod = 0;
-    }
 
 
     public void pauseTimer() {
@@ -180,29 +159,34 @@ public class TimerService extends Service {
 
     public void stopTimer() {
 
-    if (timerState != TimerState.STOPPED) {
-        synchronized (timerThreadLock) {
-            timerState = TimerState.STOPPED;
-            timerThreadLock.notifyAll();
+        if (timerState != TimerState.STOPPED) {
+            synchronized (timerThreadLock) {
+                timerState = TimerState.STOPPED;
+                timerThreadLock.notifyAll();
+            }
+
+            startForeground(0, null);
+            sendStopIntent();
         }
-        try {
-            timerThread.join();
-        } catch (InterruptedException e) {
-
-        }
-        startForeground(0, null);
-        sendStopIntent();
-    }
-
-
-
 
     }
+    public PeriodState getNextPeriod(){
+        switch (currentPeriod){
+            case FOCUS:
+                if (consecutiveFocusPeriod >= periodsUntilBreak) return PeriodState.BIG_BREAK;
+                else return PeriodState.BREAK;
+            case NOT_INITIALIZED:
+            case BREAK:
+            case BIG_BREAK:
+                return PeriodState.FOCUS;
+        }
+        return PeriodState.NOT_INITIALIZED;
+    }
 
-    private int getTimeLeftMillis(){
+    public int getTimeLeftMillis(PeriodState period){
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         int timeLeft = 0;
-        switch (currentPeriod){
+        switch (period){
             case NOT_INITIALIZED:
 
             case FOCUS:
@@ -230,15 +214,30 @@ public class TimerService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
+    private void sendStartIntent() {
+        Intent intent = new Intent(ACTION_SEND_TIME);
+        intent.putExtra(BOOLEAN_TIMER_STARTED, true);
+        intent.putExtra(INT_TIME_MILLIS_LEFT, timeMillisLeft);
+        intent.putExtra(INT_TIME_MILLIS_TOTAL, totalMillis);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+
     private void sendPauseIntent(){
+
         Intent intent = new Intent(ACTION_SEND_TIME);
         intent.putExtra(BOOLEAN_TIMER_PAUSED, true);
+        intent.putExtra(INT_TIME_MILLIS_LEFT, timeMillisLeft);
+        intent.putExtra(INT_TIME_MILLIS_TOTAL, totalMillis);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     private void sendStopIntent(){
+        int millis = getTimeLeftMillis(getNextPeriod());
         Intent intent = new Intent(ACTION_SEND_TIME);
         intent.putExtra(BOOLEAN_TIMER_STOPPED, true);
+        intent.putExtra(INT_TIME_MILLIS_LEFT, millis);
+        intent.putExtra(INT_TIME_MILLIS_TOTAL, millis);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

@@ -41,8 +41,12 @@ public class TimerView extends View {
     private ValueAnimator timerAnimator, drawAnimator;
     boolean animatingTimer = false;
     boolean animatingDraw = false;
+    int animationDrawDuration = 300;
 
     private String currentTimerString = "00:00";
+
+    private enum TimerState {STARTED, PAUSED, STOPPED}
+    private volatile TimerState timerState = TimerState.STOPPED;
 
 
 
@@ -177,23 +181,38 @@ public class TimerView extends View {
 
 
     public void setTime(int timeMillisTotal, int timeMillisLeft){
-        int animationDrawDuration = 100;
-
+        stopDrawAnimation();
         float newSweepAngle;
+        switch (timerState){
+            case STARTED:
+                if (!animatingTimer){
+                    stopDrawAnimation();
+                    timeMillisLeft = timeMillisLeft <= 0 ? 0 : timeMillisLeft - animationDrawDuration;
+                    newSweepAngle = getNewSweepAngle(timeMillisTotal, timeMillisLeft);
+                    animateDrawArc(animationDrawDuration, newSweepAngle);
+                    animateArc(timeMillisLeft,animationDrawDuration, newSweepAngle);
+                    animatingTimer = true;
+                }
+                break;
+            case PAUSED:
 
-        if (!animatingTimer){
-            stopDrawAnimation();
-            timeMillisLeft = timeMillisLeft <= 0 ? 0 : timeMillisLeft - animationDrawDuration;
-            newSweepAngle = getNewSweepAngle(timeMillisTotal, timeMillisLeft);
-            animateDrawArc(animationDrawDuration, newSweepAngle);
-            animateArc(timeMillisLeft,animationDrawDuration, newSweepAngle);
-            animatingTimer = true;
-        } else {
+
+            case STOPPED:
+                if (animatingTimer){
+                    stopDrawAnimation();
+                    stopAnimation();
+                    animatingTimer = false;
+                }
+                newSweepAngle = getNewSweepAngle(timeMillisTotal, timeMillisLeft);
+                animateDrawArc(animationDrawDuration, newSweepAngle);
 
         }
+
         setCurrentTimerString(getTimeString(timeMillisLeft));
 
     }
+
+
 
 
 
@@ -268,5 +287,29 @@ public class TimerView extends View {
                 minutes,TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(minutes));
     }
 
+
+    public void timerStarted(int millisTotal, int millisLeft){
+        timerState = TimerState.STARTED;
+        setTime(millisTotal, millisLeft);
+    }
+
+
+    public void timerPaused(int millisTotal, int millisLeft){
+        timerState = TimerState.PAUSED;
+        setTime(millisTotal, millisLeft);
+
+    }
+
+    public void timerStopped(int millisTotal, int millisLeft){
+        timerState = TimerState.STOPPED;
+        setTime(millisTotal, millisLeft);
+
+    }
+
+    public void updateTimer(int millisTotal, int millisLeft){
+
+        setTime(millisTotal, millisLeft);
+
+    }
 
 }

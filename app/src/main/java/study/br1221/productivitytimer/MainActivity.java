@@ -59,10 +59,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onStart() {
         super.onStart();
+        // Bind TimerService.
         LocalBroadcastManager.getInstance(this).registerReceiver(onEvent , new IntentFilter(TimerService.ACTION_SEND_TIME));
         Intent intent = new Intent(this, TimerService.class);
         startService(intent);
-        bindService(intent,serviceConnection, Context.BIND_AUTO_CREATE);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
 
 
     }
@@ -108,7 +109,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             int timeMillisTotal = intent.getIntExtra(TimerService.INT_TIME_MILLIS_TOTAL, 0);
             boolean timerStopped = intent.getBooleanExtra(TimerService.BOOLEAN_TIMER_STOPPED, false);
             boolean timerPaused = intent.getBooleanExtra(TimerService.BOOLEAN_TIMER_PAUSED, false);
-            updateTimerView(timerStopped, timerPaused, timeMillisTotal, timeMillisLeft);
+            boolean timerStarted = intent.getBooleanExtra(TimerService.BOOLEAN_TIMER_STARTED, false);
+
+            updateTimerView(timerStarted ,timerPaused, timerStopped, timeMillisTotal, timeMillisLeft);
 
 
             remainingTimeTv.setText(getTimeString(timeMillisLeft));
@@ -117,13 +120,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     };
 
 
-    private void updateTimerView(boolean timerStopped, boolean timerPaused, int millisTotal, int millisLeft){
-        if(timerPaused){
-            timerView.stopAnimation();
+    private void updateTimerView(boolean timerStarted, boolean timerPaused, boolean timerStopped, int millisTotal, int millisLeft){
+        if (timerStarted){
+            timerView.timerStarted(millisTotal, millisLeft);
+        }else if(timerPaused){
+            timerView.timerPaused(millisTotal, millisLeft);
         } else if(timerStopped){
-            timerView.setTime(0, 0);
-            timerView.stopAnimation();
-        } else timerView.setTime(millisTotal, millisLeft);
+            timerView.timerStopped(millisTotal, millisLeft);
+        } else timerView.updateTimer(millisTotal, millisLeft);
 
     }
 
@@ -133,11 +137,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 minutes,TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(minutes));
     }
 
+    public void initializeTimerView(){
+        int initialTimeMillis = timerService.getTimeLeftMillis(timerService.getNextPeriod());
+        updateTimerView(false,false, false, initialTimeMillis, initialTimeMillis);
+    }
+
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             timerService = ((TimerService.LocalBinder) iBinder).getService();
+            initializeTimerView();
         }
 
         @Override
