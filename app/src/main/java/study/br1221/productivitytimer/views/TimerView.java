@@ -98,6 +98,7 @@ public class TimerView extends View {
         backgroundArcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         backgroundArcPaint.setStyle(Paint.Style.STROKE);
         backgroundArcPaint.setStrokeCap(Paint.Cap.ROUND);
+        //backgroundArcPaint.setShadowLayer(2, 0.0f, 2.0f, 0x38212121); ------------shadow
 
         foregroundArcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         foregroundArcPaint.setStyle(Paint.Style.STROKE);

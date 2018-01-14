@@ -1,6 +1,7 @@
 package study.br1221.productivitytimer;
 
 import android.app.IntentService;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -23,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.sleep;
 
@@ -63,6 +65,15 @@ public class TimerService extends Service {
     private int totalMillis = 0;
     private long stopTimeMillis = 0;
 
+
+    private static String startActionIntentString = "com.example.app.ACTION_TIMER_START";
+    private static String pauseActionIntentString = "com.example.app.ACTION_TIMER_PAUSE";
+    private static String stopActionIntentString = "com.example.app.ACTION_TIMER_STOP";
+
+    private PendingIntent startActionIntent, stopActionIntent, pauseActionIntent, openMainActivityIntent;
+
+
+
     public class LocalBinder extends Binder {
         TimerService getService() {
             return TimerService.this;
@@ -87,6 +98,7 @@ public class TimerService extends Service {
         thisTimerService = this;
 
         createIntentFilter();
+        initControlIntents();
 
         return START_STICKY;
     }
@@ -94,10 +106,26 @@ public class TimerService extends Service {
     private void createIntentFilter(){
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
-        intentFilter.addAction("com.example.app.ACTION_TIMER_START");
-        intentFilter.addAction("com.example.app.ACTION_TIMER_PAUSE");
-        intentFilter.addAction("com.example.app.ACTION_TIMER_STOP");
+        intentFilter.addAction(startActionIntentString);
+        intentFilter.addAction(pauseActionIntentString);
+        intentFilter.addAction(stopActionIntentString);
         registerReceiver(actionReceiver, intentFilter);
+    }
+
+    private void initControlIntents(){
+        Intent intentMainActivity = new Intent(this, MainActivity.class);
+        openMainActivityIntent = PendingIntent.getActivity(this, 1, intentMainActivity, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent startIntent = new Intent(startActionIntentString);
+        startActionIntent = PendingIntent.getBroadcast(this, 100, startIntent, 0);
+
+        Intent pauseIntent = new Intent(pauseActionIntentString);
+        pauseActionIntent = PendingIntent.getBroadcast(this, 100, pauseIntent, 0);
+
+
+        Intent stopIntent = new Intent(stopActionIntentString);
+        stopActionIntent = PendingIntent.getBroadcast(this, 100, stopIntent, 0);
+
     }
 
     @Override
@@ -253,32 +281,49 @@ public class TimerService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-    private void outputNotification(String time){
-        NotificationManager NotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        Intent intentMainActivity = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntentMainActivity = PendingIntent.getActivity(this, 1, intentMainActivity, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent startIntent = new Intent("com.example.app.ACTION_TIMER_START");
-        PendingIntent startPendingIntent = PendingIntent.getBroadcast(this, 100, startIntent, 0);
+    private void timerRunningNotification(int millisLeft){
+        Notification.Builder builder =
+                new Notification.Builder(this)
+                        .setSmallIcon(R.mipmap.bitmap)
+                        .setContentTitle("running")
+                        .setContentText(getTimeString(millisLeft))
+                        .setContentIntent(openMainActivityIntent)
+                        .addAction(new Notification.Action(R.mipmap.ic_launcher_round, "Pause", pauseActionIntent))
+                        .addAction(new Notification.Action(R.mipmap.ic_launcher_round, "Stop", stopActionIntent));
+        startForeground(timerNotificationId, builder.build());
+    }
 
-        Intent pauseIntent = new Intent("com.example.app.ACTION_TIMER_PAUSE");
-        PendingIntent pausePendingIntent = PendingIntent.getBroadcast(this, 100, pauseIntent, 0);
+    private void timerPausedNotification(int millisLeft){
+        Notification.Builder builder =
+                new Notification.Builder(this)
+                        .setSmallIcon(R.mipmap.bitmap)
+                        .setContentTitle("paused")
+                        .setContentText(getTimeString(millisLeft))
+                        .setContentIntent(openMainActivityIntent)
+                        .addAction(new Notification.Action(R.mipmap.ic_launcher_round, "Resume", startActionIntent))
+                        .addAction(new Notification.Action(R.mipmap.ic_launcher_round, "Stop", stopActionIntent));
+        startForeground(timerNotificationId, builder.build());
+    }
 
+    private void timerFinishedNotification(){
+        Notification.Builder builder =
+                new Notification.Builder(this)
+                        .setSmallIcon(R.mipmap.bitmap)
+                        .setContentTitle("finished")
+                        .setContentText("finished")
+                        .setContentIntent(openMainActivityIntent)
+                        .addAction(new Notification.Action(R.mipmap.ic_launcher_round, "Start", startActionIntent));
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        Intent stopIntent = new Intent("com.example.app.ACTION_TIMER_STOP");
-        PendingIntent stopPendingIntent = PendingIntent.getBroadcast(this, 100, stopIntent, 0);
+        mNotificationManager.notify(timerNotificationId, builder.build());
+    }
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher_round)
-                        .setContentTitle("My notification")
-                        .setContentText(time)
-                        .setContentIntent(pendingIntentMainActivity)
-                        .addAction(new NotificationCompat.Action(R.mipmap.ic_launcher_round, "Start", startPendingIntent))
-                        .addAction(new NotificationCompat.Action(R.mipmap.ic_launcher_round, "Pause", pausePendingIntent))
-                        .addAction(new NotificationCompat.Action(R.mipmap.ic_launcher_round, "Stop", stopPendingIntent));
-        startForeground(timerNotificationId, mBuilder.build());
-
+    private String getTimeString(int millis){
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+        return String.format("%02d:%02d",
+                minutes,TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(minutes));
     }
 
 
@@ -292,9 +337,10 @@ public class TimerService extends Service {
                     timeMillisLeft = (int)(stopTimeMillis - System.currentTimeMillis());
 
                     sendTime(totalMillis, timeMillisLeft);
-                    outputNotification(String.valueOf(timeMillisLeft));
+                    timerRunningNotification(timeMillisLeft);
                     if(timeMillisLeft <= 0){
                         stopTimer();
+                        timerFinishedNotification();
                     }
 
                     try {
@@ -303,6 +349,7 @@ public class TimerService extends Service {
 
                     }
                     while (timerState == TimerState.PAUSED) {
+                        timerPausedNotification(timeMillisLeft);
                         try {
                             timerThreadLock.wait();
                         } catch (InterruptedException e) {
