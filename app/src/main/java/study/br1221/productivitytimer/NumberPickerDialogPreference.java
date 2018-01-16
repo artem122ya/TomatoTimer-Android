@@ -10,26 +10,32 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.NumberPicker;
 
-/**
- * A {@link android.preference.Preference} that displays a number picker as a dialog.
- */
-public class MinutePickerDialogPreference extends DialogPreference {
+public class NumberPickerDialogPreference extends DialogPreference {
+
+    public static String attributeNamespace = "study.br1221.productivitytimer";
 
     // allowed range
-    public static final int MAX_VALUE = 200;
-    public static final int MIN_VALUE = 0;
+    public int maxValue;
+    public int minValue;
     // enable or disable the 'circular behavior'
-    public static final boolean WRAP_SELECTOR_WHEEL = true;
+    public static final boolean WRAP_SELECTOR_WHEEL = false;
 
     private NumberPicker picker;
     private int value;
 
-    public MinutePickerDialogPreference(Context context, AttributeSet attrs) {
+    public NumberPickerDialogPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init(attrs);
     }
 
-    public MinutePickerDialogPreference(Context context, AttributeSet attrs, int defStyleAttr) {
+    public NumberPickerDialogPreference(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init(attrs);
+    }
+
+    private void init(AttributeSet attrs){
+        minValue = attrs.getAttributeIntValue(attributeNamespace, "min_value", 0);
+        maxValue = attrs.getAttributeIntValue(attributeNamespace, "max_value", 100);
     }
 
     @Override
@@ -50,8 +56,8 @@ public class MinutePickerDialogPreference extends DialogPreference {
     @Override
     protected void onBindDialogView(View view) {
         super.onBindDialogView(view);
-        picker.setMinValue(MIN_VALUE);
-        picker.setMaxValue(MAX_VALUE);
+        picker.setMinValue(minValue);
+        picker.setMaxValue(maxValue);
         picker.setWrapSelectorWheel(WRAP_SELECTOR_WHEEL);
         picker.setValue(getValue());
     }
@@ -69,12 +75,12 @@ public class MinutePickerDialogPreference extends DialogPreference {
 
     @Override
     protected Object onGetDefaultValue(TypedArray a, int index) {
-        return a.getInt(index, MIN_VALUE);
+        return a.getInt(index, minValue);
     }
 
     @Override
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
-        setValue(restorePersistedValue ? getPersistedInt(MIN_VALUE) : (Integer) defaultValue);
+        setValue(restorePersistedValue ? getPersistedInt(minValue) : (Integer) defaultValue);
     }
 
     public void setValue(int value) {
