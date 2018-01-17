@@ -144,6 +144,7 @@ public class TimerService extends Service {
 
         synchronized (timerThreadLock) {
             if (timerState == TimerState.STOPPED) {
+                checkNumberOfSessionsUntilBreak();
                 timeMillisStarted = System.currentTimeMillis();
                 totalMillis = getTimeLeftMillis(currentPeriod);
                 timeMillisLeft = totalMillis;
@@ -170,6 +171,12 @@ public class TimerService extends Service {
         } else if (currentPeriod == PeriodState.BIG_BREAK){
             consecutiveFocusPeriod = 0;
         }
+    }
+
+
+    private void checkNumberOfSessionsUntilBreak(){
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        periodsUntilBreak = sharedPrefs.getInt("sessions_until_big_break", 0);
     }
 
 
@@ -207,7 +214,7 @@ public class TimerService extends Service {
     public PeriodState getNextPeriod(){
         switch (currentPeriod){
             case FOCUS:
-                if (consecutiveFocusPeriod >= periodsUntilBreak) return PeriodState.BIG_BREAK;
+                if (periodsUntilBreak != 0 && consecutiveFocusPeriod >= periodsUntilBreak - 1) return PeriodState.BIG_BREAK;
                 else return PeriodState.BREAK;
             case NOT_INITIALIZED:
             case BREAK:
@@ -295,8 +302,8 @@ public class TimerService extends Service {
                         .setContentTitle("running")
                         .setContentText(getTimeString(timeMillisLeft))
                         .setContentIntent(openMainActivityIntent)
-                        .addAction(new Notification.Action(R.mipmap.ic_launcher_round, "Pause", pauseActionIntent))
-                        .addAction(new Notification.Action(R.mipmap.ic_launcher_round, "Stop", stopActionIntent))
+                        .addAction(new Notification.Action(R.drawable.ic_pause_black_24dp, "Pause", pauseActionIntent))
+                        .addAction(new Notification.Action(R.drawable.ic_stop_black_24dp, "Stop", stopActionIntent))
                         .setProgress(totalMillis, timeMillisLeft, false);
         startForeground(timerNotificationId, builder.build());
     }
@@ -308,8 +315,8 @@ public class TimerService extends Service {
                         .setContentTitle("paused")
                         .setContentText(getTimeString(timeMillisLeft))
                         .setContentIntent(openMainActivityIntent)
-                        .addAction(new Notification.Action(R.mipmap.ic_launcher_round, "Resume", startActionIntent))
-                        .addAction(new Notification.Action(R.mipmap.ic_launcher_round, "Stop", stopActionIntent));
+                        .addAction(new Notification.Action(R.drawable.ic_play_arrow_black_24dp, "Resume", startActionIntent))
+                        .addAction(new Notification.Action(R.drawable.ic_stop_black_24dp, "Stop", stopActionIntent));
         startForeground(timerNotificationId, builder.build());
     }
 
@@ -320,8 +327,8 @@ public class TimerService extends Service {
                         .setContentTitle("finished")
                         .setContentText("finished")
                         .setContentIntent(openMainActivityIntent)
-                        .addAction(new Notification.Action(R.mipmap.ic_launcher_round, "Start", startActionIntent))
-                        .addAction(new Notification.Action(R.mipmap.ic_launcher_round, "Stop", stopActionIntent))
+                        .addAction(new Notification.Action(R.drawable.ic_play_arrow_black_24dp, "Start", startActionIntent))
+                        .addAction(new Notification.Action(R.drawable.ic_stop_black_24dp, "Stop", stopActionIntent))
                         .setDefaults(Notification.DEFAULT_ALL)
                         .setPriority(Notification.PRIORITY_MAX);
 
