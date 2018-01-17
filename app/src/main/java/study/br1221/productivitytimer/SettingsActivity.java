@@ -11,16 +11,35 @@ import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.view.MenuItem;
+import android.view.View;
 
 
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends AppCompatActivity {
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         getFragmentManager().beginTransaction().replace(android.R.id.content, new TimerPreferenceFragment()).commit();
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     public static class TimerPreferenceFragment extends PreferenceFragment implements
@@ -29,8 +48,7 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
-            PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences,
-                    false);
+            PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
             initSummary(getPreferenceScreen());
         }
 
@@ -69,20 +87,26 @@ public class SettingsActivity extends PreferenceActivity {
         private void updatePrefSummary(Preference p) {
             if (p instanceof ListPreference) {
                 ListPreference listPref = (ListPreference) p;
-                p.setSummary(listPref.getEntry());
+                modifySummary(p, String.valueOf(listPref.getEntry()));
             }
             if (p instanceof EditTextPreference) {
                 EditTextPreference editTextPref = (EditTextPreference) p;
-                p.setSummary(editTextPref.getText());
+                modifySummary(p, editTextPref.getText());
             }
             if (p instanceof MultiSelectListPreference) {
                 EditTextPreference editTextPref = (EditTextPreference) p;
-                p.setSummary(editTextPref.getText());
+                modifySummary(p, editTextPref.getText());
             }
-            if (p instanceof MinutePickerDialogPreference) {
-                MinutePickerDialogPreference minutePickerPref = (MinutePickerDialogPreference) p;
-                p.setSummary(String.valueOf(minutePickerPref.getValue()));
+            if (p instanceof NumberPickerDialogPreference) {
+                NumberPickerDialogPreference minutePickerPref = (NumberPickerDialogPreference) p;
+                modifySummary(p, String.valueOf(minutePickerPref.getValue()));
             }
+        }
+
+        private void modifySummary(Preference preference, String value){
+            String summary = String.valueOf(preference.getSummary());
+            summary = summary.replaceFirst("\\d{1,4}", value);
+            preference.setSummary(summary);
         }
     }
 }
