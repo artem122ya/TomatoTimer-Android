@@ -75,6 +75,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onRestart() {
+        // Redraw timerView in case any settings changed
+        super.onRestart();
+        initializeTimerView();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
@@ -97,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (view == start){
             timerService.startTimer();
         } else if (view == stop) {
-            timerService.stopTimer();
+            timerService.stopServiceAndTimer();
         } else if (view == pause) {
             timerService.pauseTimer();
         }
