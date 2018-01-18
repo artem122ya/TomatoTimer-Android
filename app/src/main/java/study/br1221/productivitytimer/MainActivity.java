@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        remainingTimeTv.setText(String.valueOf(sharedPrefs.getInt("timer_minutes", -1)));
+        remainingTimeTv.setText(String.valueOf(sharedPrefs.getInt("sessions_until_big_break", -1)));
 
 
     }
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void initializeTimerView(){
-        updateTimerView(false,false, false,
+        updateTimerView(timerService.isStarted(),timerService.isPaused(), timerService.isStopped(),
                 timerService.getMillisTotal(), timerService.getMillisLeft());
     }
 

@@ -67,6 +67,7 @@ public class TimerView extends View {
         init(context, attrs);
     }
 
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         // Make view square
@@ -179,7 +180,6 @@ public class TimerView extends View {
 
     private void setArcSweepAngle(float angle){
         arcSweepAngle = angle;
-        Log.d("timerview", "setArcSweepAngle" + String.valueOf(angle));
         postInvalidate();
     }
 
@@ -218,10 +218,7 @@ public class TimerView extends View {
             animatingTimer = false;
         }
         float newSweepAngle = getNewSweepAngle(timeMillisTotal, timeMillisLeft);
-        if (firstDraw){
-            setArcSweepAngle(newSweepAngle);
-            firstDraw = false;
-        } else animateDrawArc(animationDrawDuration, newSweepAngle);
+        animateDrawArc(animationDrawDuration, newSweepAngle);
     }
 
 
@@ -238,23 +235,27 @@ public class TimerView extends View {
     }
 
     private void animateDrawArc(int durationMillis, float destinationAngle){
-        // animator for smooth arc drawing
-        drawAnimator = ValueAnimator.ofFloat(arcSweepAngle, destinationAngle);
-        drawAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator updatedAnimation) {
-                float animatedValue = (float)updatedAnimation.getAnimatedValue();
-                setArcSweepAngle(animatedValue);
-            }
-        });
-        drawAnimator.setInterpolator(new TimeInterpolator() {
-            @Override
-            public float getInterpolation(float v) {
-                return v;
-            }
-        });
-        drawAnimator.setDuration(durationMillis);
-        drawAnimator.start();
+        if (firstDraw) {
+            setArcSweepAngle(destinationAngle);
+            firstDraw = false;
+        } else {
+            drawAnimator = ValueAnimator.ofFloat(arcSweepAngle, destinationAngle);
+            drawAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator updatedAnimation) {
+                    float animatedValue = (float) updatedAnimation.getAnimatedValue();
+                    setArcSweepAngle(animatedValue);
+                }
+            });
+            drawAnimator.setInterpolator(new TimeInterpolator() {
+                @Override
+                public float getInterpolation(float v) {
+                    return v;
+                }
+            });
+            drawAnimator.setDuration(durationMillis);
+            drawAnimator.start();
+        }
     }
 
     private void animateArc(int durationMillis, int delayMillis, float startingAngle){

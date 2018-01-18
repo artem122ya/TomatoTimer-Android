@@ -1,32 +1,19 @@
 package study.br1221.productivitytimer;
 
-import android.app.IntentService;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.annotation.IntDef;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-
-import static java.lang.Thread.sleep;
 
 public class TimerService extends Service {
 
@@ -114,6 +101,7 @@ public class TimerService extends Service {
 
     private void initControlIntents(){
         Intent intentMainActivity = new Intent(this, MainActivity.class);
+        intentMainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         openMainActivityIntent = PendingIntent.getActivity(this, 1, intentMainActivity, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent startIntent = new Intent(startActionIntentString);
@@ -199,6 +187,8 @@ public class TimerService extends Service {
                 timerState = TimerState.STOPPED;
                 timerThreadLock.notifyAll();
             }
+            totalMillis = getTimeLeftMillis(getNextPeriod());
+            timeMillisLeft = totalMillis;
 
             sendStopIntent();
         }
@@ -250,6 +240,7 @@ public class TimerService extends Service {
     private void sendTime(int totalMillis, int millisLeft){
         /* Method sends total time and time left in milliseconds */
         Intent intent = new Intent(ACTION_SEND_TIME);
+        intent.putExtra(BOOLEAN_TIMER_STARTED, true);
         intent.putExtra(INT_TIME_MILLIS_LEFT, millisLeft);
         intent.putExtra(INT_TIME_MILLIS_TOTAL, totalMillis);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
@@ -341,6 +332,20 @@ public class TimerService extends Service {
                 minutes,TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(minutes));
     }
 
+
+    public boolean isStarted(){
+        return timerState == TimerState.STARTED;
+    }
+
+
+    public boolean isStopped(){
+        return timerState == TimerState.STOPPED;
+    }
+
+
+    public boolean isPaused(){
+        return timerState == TimerState.PAUSED;
+    }
 
 
     private class TimerRunnable implements Runnable {
