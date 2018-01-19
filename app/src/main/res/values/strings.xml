@@ -12,4 +12,7 @@
     <string name="big_break_minute_picker_summary">00 minutes</string>
     <string name="sessions_until_big_break_title">Focus sessions until big break</string>
     <string name="sessions_until_big_break_summary">00 sessions</string>
+    <string name="stop_button_content_description">Stop button.</string>
+    <string name="start_and_pause_button_content_description">Start or pause button.</string>
+    <string name="skip_button_content_description">Skip button.</string>
 </resources>

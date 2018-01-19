@@ -14,7 +14,7 @@
         android:layout_row="0" />
 
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/stopButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_column="0"
@@ -23,10 +23,11 @@
         android:layout_row="1"
         android:background="?android:selectableItemBackground"
         android:scaleType="fitXY"
-        app:srcCompat="@drawable/ic_stop_black_85_opacity" />
+        app:srcCompat="@drawable/ic_stop_black_85_opacity"
+        android:contentDescription="@string/stop_button_content_description"/>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floatingActionButton"
+        android:id="@+id/startPauseButton"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_column="1"
@@ -37,10 +38,12 @@
         android:clickable="true"
         app:borderWidth="0dp"
         app:elevation="0dp"
-        app:srcCompat="@drawable/ic_play_white_85_opacity" />
+        app:srcCompat="@drawable/ic_play_white_85_opacity"
+        android:focusable="true"
+        android:contentDescription="@string/start_and_pause_button_content_description"/>
 
     <ImageButton
-        android:id="@+id/imageButton2"
+        android:id="@+id/skipButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_column="2"
@@ -49,5 +52,6 @@
         android:layout_row="1"
         android:background="?android:selectableItemBackground"
         android:scaleType="fitXY"
-        app:srcCompat="@drawable/ic_skip_next_black_85_opacity" />
+        app:srcCompat="@drawable/ic_skip_next_black_85_opacity"
+        android:contentDescription="@string/skip_button_content_description"/>
 </GridLayout>
