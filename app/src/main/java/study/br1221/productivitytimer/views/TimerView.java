@@ -51,6 +51,8 @@ public class TimerView extends View {
 
     private boolean firstDraw = true;
 
+    private int viewMarginPixels;
+
 
     public TimerView(Context context) {
         super(context);
@@ -161,8 +163,11 @@ public class TimerView extends View {
         viewWidth = getWidth();
         viewHeight = getHeight();
 
+        //create margin
+        viewMarginPixels = viewWidth / 14;
+
         //create arc rect with 100px margin
-        arcRect = new RectF(100, 100, viewWidth - 100, viewHeight - 100);
+        arcRect = new RectF(viewMarginPixels, viewMarginPixels, viewWidth - viewMarginPixels, viewHeight - viewMarginPixels);
 
         //create background arc
         backgroundArcPath = new Path();
@@ -172,7 +177,7 @@ public class TimerView extends View {
         foregroundArcPath = new Path();
         foregroundArcPath.arcTo(arcRect, initialArcStartAngle, arcSweepAngle);
 
-        //set dynamic arcWidth
+        //set arcWidth
         arcWidth = viewWidth / 22;
         backgroundArcPaint.setStrokeWidth(arcWidth*0.95f); // *0.95f so there is no antialiasing overlap
         foregroundArcPaint.setStrokeWidth(arcWidth);
