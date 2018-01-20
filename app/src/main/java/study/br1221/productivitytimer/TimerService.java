@@ -20,9 +20,6 @@ public class TimerService extends Service {
     public static String ACTION_SEND_TIME = "time_send";
     public static String INT_TIME_MILLIS_LEFT = "time_extra_millis_left";
     public static String INT_TIME_MILLIS_TOTAL = "time_extra_millis_total";
-    public static String BOOLEAN_TIMER_PAUSED = "timer_paused";
-    public static String BOOLEAN_TIMER_STOPPED = "timer_stopped";
-    public static String BOOLEAN_TIMER_STARTED = "timer_started";
     public static String ENUM_TIMER_STATE = "timer_state";
 
 
@@ -45,7 +42,7 @@ public class TimerService extends Service {
 
     private enum PeriodState {FOCUS, BREAK, BIG_BREAK, NOT_INITIALIZED}
     private PeriodState currentPeriod = PeriodState.NOT_INITIALIZED;
-    private int consecutiveFocusPeriod = 0;
+    private int consecutiveFocusPeriod = 1;
     private int periodsUntilBreak = 3;
 
     private volatile int timeMillisLeft = 0;
@@ -87,6 +84,7 @@ public class TimerService extends Service {
 
         createIntentFilter();
         initControlIntents();
+        checkNumberOfSessionsUntilBreak();
 
         return START_NOT_STICKY;
     }
@@ -125,14 +123,11 @@ public class TimerService extends Service {
 
     public void startTimer(){
 
-        if (timerState != TimerState.PAUSED){
-            moveToNextPeriod();
-        }
-
         thisTimerService = this;
 
         synchronized (timerThreadLock) {
             if (timerState == TimerState.STOPPED) {
+                moveToNextPeriod();
                 checkNumberOfSessionsUntilBreak();
                 timeMillisStarted = System.currentTimeMillis();
                 totalMillis = getTimeLeftMillis(currentPeriod);
@@ -155,14 +150,14 @@ public class TimerService extends Service {
         if (currentPeriod == PeriodState.FOCUS){
             consecutiveFocusPeriod++;
         } else if (currentPeriod == PeriodState.BIG_BREAK){
-            consecutiveFocusPeriod = 0;
+            consecutiveFocusPeriod = 1;
         }
     }
 
 
     private void checkNumberOfSessionsUntilBreak(){
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        periodsUntilBreak = sharedPrefs.getInt("sessions_until_big_break", 0);
+        periodsUntilBreak = sharedPrefs.getInt("sessions_until_big_break", 0) + 1;
     }
 
 
@@ -194,8 +189,7 @@ public class TimerService extends Service {
 
 
     public void onStopButtonClick(){
-        consecutiveFocusPeriod = 0;
-        currentPeriod = PeriodState.NOT_INITIALIZED;
+        consecutiveFocusPeriod = 1;
         stopTimer();
         stopForeground(true);
     }
@@ -206,8 +200,15 @@ public class TimerService extends Service {
     }
 
     public void onSkipButtonClick(){
-        stopTimer();
-        startTimer();
+        synchronized (timerThreadLock) {
+            if (timerState == TimerState.STOPPED) {
+                moveToNextPeriod();
+                sendTime(getTimeLeftMillis(getNextPeriod()), getTimeLeftMillis(getNextPeriod()));
+            } else {
+                stopTimer();
+            }
+
+        }
     }
 
 
@@ -268,32 +269,6 @@ public class TimerService extends Service {
         } else return totalMillis;
     }
 
-    private void sendStartIntent() {
-        Intent intent = new Intent(ACTION_SEND_TIME);
-        intent.putExtra(BOOLEAN_TIMER_STARTED, true);
-        intent.putExtra(INT_TIME_MILLIS_LEFT, timeMillisLeft);
-        intent.putExtra(INT_TIME_MILLIS_TOTAL, totalMillis);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
-
-    private void sendPauseIntent(){
-
-        Intent intent = new Intent(ACTION_SEND_TIME);
-        intent.putExtra(BOOLEAN_TIMER_PAUSED, true);
-        intent.putExtra(INT_TIME_MILLIS_LEFT, timeMillisLeft);
-        intent.putExtra(INT_TIME_MILLIS_TOTAL, totalMillis);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
-    private void sendStopIntent(){
-        int millis = getTimeLeftMillis(getNextPeriod());
-        Intent intent = new Intent(ACTION_SEND_TIME);
-        intent.putExtra(BOOLEAN_TIMER_STOPPED, true);
-        intent.putExtra(INT_TIME_MILLIS_LEFT, millis);
-        intent.putExtra(INT_TIME_MILLIS_TOTAL, millis);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
 
     public TimerState getCurrentTimerState(){
         return timerState;
@@ -344,21 +319,6 @@ public class TimerService extends Service {
         long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
         return String.format("%02d:%02d",
                 minutes,TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(minutes));
-    }
-
-
-    public boolean isStarted(){
-        return timerState == TimerState.STARTED;
-    }
-
-
-    public boolean isStopped(){
-        return timerState == TimerState.STOPPED;
-    }
-
-
-    public boolean isPaused(){
-        return timerState == TimerState.PAUSED;
     }
 
 
