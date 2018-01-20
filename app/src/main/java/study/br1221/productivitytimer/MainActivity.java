@@ -6,53 +6,43 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.ImageButton;
 
-import java.sql.Time;
-import java.util.concurrent.TimeUnit;
-
+import study.br1221.productivitytimer.TimerService.TimerState;
 import study.br1221.productivitytimer.views.TimerView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private TextView remainingTimeTv;
-    private Button start, stop, pause;
+    private FloatingActionButton startButton;
+    private ImageButton stopButton, skipButton;
 
     private TimerService timerService;
 
     private TimerView timerView;
+
+    private TimerState currentTimerState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        remainingTimeTv = (TextView) findViewById(R.id.remainingTimeTv);
-        start = (Button) findViewById(R.id.startBtn);
-        stop = (Button) findViewById(R.id.stopBtn);
-        pause = (Button) findViewById(R.id.pauseBtn);
-        start.setOnClickListener(this);
-        stop.setOnClickListener(this);
-        pause.setOnClickListener(this);
+        startButton = findViewById(R.id.startPauseButton);
+        stopButton = findViewById(R.id.stopButton);
+        skipButton = findViewById(R.id.skipButton);
+        timerView = findViewById(R.id.timerView);
 
-        timerView = (TimerView) findViewById(R.id.timerView);
-
-        //--------------------------------------------------------
-
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        remainingTimeTv.setText(String.valueOf(sharedPrefs.getInt("sessions_until_big_break", -1)));
-
+        startButton.setOnClickListener(this);
+        stopButton.setOnClickListener(this);
+        skipButton.setOnClickListener(this);
 
     }
 
@@ -78,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onRestart() {
         // Redraw timerView in case any settings changed
         super.onRestart();
+        updateButtons(timerService.getCurrentTimerState());
         initializeTimerView();
     }
 
@@ -101,12 +92,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        if (view == start){
-            timerService.startTimer();
-        } else if (view == stop) {
-            timerService.stopServiceAndTimer();
-        } else if (view == pause) {
-            timerService.pauseTimer();
+        if (view == startButton){
+            timerService.onStartPauseButtonClick();
+        } else if (view == stopButton) {
+            timerService.onStopButtonClick();
+        } else if (view == skipButton) {
+            timerService.onSkipButtonClick();
         }
     }
 
@@ -114,39 +105,58 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void onReceive(Context context, Intent intent) {
             int timeMillisLeft = intent.getIntExtra(TimerService.INT_TIME_MILLIS_LEFT, 0);
             int timeMillisTotal = intent.getIntExtra(TimerService.INT_TIME_MILLIS_TOTAL, 0);
-            boolean timerStopped = intent.getBooleanExtra(TimerService.BOOLEAN_TIMER_STOPPED, false);
-            boolean timerPaused = intent.getBooleanExtra(TimerService.BOOLEAN_TIMER_PAUSED, false);
-            boolean timerStarted = intent.getBooleanExtra(TimerService.BOOLEAN_TIMER_STARTED, false);
+            TimerState timerState = (TimerState) intent.getSerializableExtra(TimerService.ENUM_TIMER_STATE);
 
-            updateTimerView(timerStarted ,timerPaused, timerStopped, timeMillisTotal, timeMillisLeft);
+            updateButtons(timerState);
 
-
-            remainingTimeTv.setText(getTimeString(timeMillisLeft));
+            updateTimerView(timerState, timeMillisTotal, timeMillisLeft);
 
         }
     };
 
 
-    private void updateTimerView(boolean timerStarted, boolean timerPaused, boolean timerStopped, int millisTotal, int millisLeft){
-        if (timerStarted){
-            timerView.timerStarted(millisTotal, millisLeft);
-        }else if(timerPaused){
-            timerView.timerPaused(millisTotal, millisLeft);
-        } else if(timerStopped){
-            timerView.timerStopped(millisTotal, millisLeft);
-        } else timerView.updateTimer(millisTotal, millisLeft);
-
+    private void updateTimerView(TimerState currentTimerState, int millisTotal, int millisLeft){
+        switch (currentTimerState){
+            case STARTED:
+                timerView.timerStarted(millisTotal, millisLeft);
+                break;
+            case PAUSED:
+                timerView.timerPaused(millisTotal, millisLeft);
+                break;
+            case STOPPED:
+                timerView.timerStopped(millisTotal, millisLeft);
+                break;
+            default:
+                timerView.updateTimer(millisTotal, millisLeft);
+        }
     }
 
-    private String getTimeString(int millis){
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
-        return String.format("%02d:%02d",
-                minutes,TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(minutes));
-    }
 
     public void initializeTimerView(){
-        updateTimerView(timerService.isStarted(),timerService.isPaused(), timerService.isStopped(),
-                timerService.getMillisTotal(), timerService.getMillisLeft());
+        updateTimerView(timerService.getCurrentTimerState(), timerService.getMillisTotal(), timerService.getMillisLeft());
+    }
+
+    public void updateButtons(TimerState timerState){
+        if (currentTimerState != timerState){
+            currentTimerState = timerState;
+            onTimerStateChanged();
+        }
+    }
+
+    private void onTimerStateChanged(){
+        switch (currentTimerState){
+            case STARTED:
+                startButton.setImageResource(R.drawable.ic_pause_white_85_opacity);
+                stopButton.setVisibility(View.VISIBLE);
+                skipButton.setVisibility(View.VISIBLE);
+                break;
+            case STOPPED:
+                stopButton.setVisibility(View.INVISIBLE);
+            case PAUSED:
+                startButton.setImageResource(R.drawable.ic_play_white_85_opacity);
+                skipButton.setVisibility(View.INVISIBLE);
+                break;
+        }
     }
 
 
@@ -154,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             timerService = ((TimerService.LocalBinder) iBinder).getService();
+            updateButtons(timerService.getCurrentTimerState());
             initializeTimerView();
         }
 

@@ -23,9 +23,10 @@ public class TimerService extends Service {
     public static String BOOLEAN_TIMER_PAUSED = "timer_paused";
     public static String BOOLEAN_TIMER_STOPPED = "timer_stopped";
     public static String BOOLEAN_TIMER_STARTED = "timer_started";
+    public static String ENUM_TIMER_STATE = "timer_state";
 
 
-    private enum TimerState {STARTED, PAUSED, STOPPED}
+    public enum TimerState {STARTED, PAUSED, STOPPED}
     private volatile TimerState timerState = TimerState.STOPPED;
 
 
@@ -138,13 +139,10 @@ public class TimerService extends Service {
                 timeMillisLeft = totalMillis;
                 stopTimeMillis = timeMillisStarted + totalMillis;
 
-                sendStartIntent();
-
                 timerThread = new Thread(new TimerRunnable());
                 timerState = TimerState.STARTED;
                 timerThread.start();
             } else if (timerState == TimerState.PAUSED) {
-                sendStartIntent();
                 timerState = TimerState.STARTED;
                 timerThreadLock.notifyAll();
             }
@@ -172,10 +170,10 @@ public class TimerService extends Service {
 
     public void pauseTimer() {
         synchronized (timerThreadLock) {
-            sendPauseIntent();
             if (timerState == TimerState.STARTED) {
                 timerState = TimerState.PAUSED;
                 timerThreadLock.notifyAll();
+                sendTime(totalMillis, timeMillisLeft);
             }
         }
     }
@@ -190,21 +188,33 @@ public class TimerService extends Service {
             totalMillis = getTimeLeftMillis(getNextPeriod());
             timeMillisLeft = totalMillis;
 
-            sendStopIntent();
+            sendTime(getTimeLeftMillis(getNextPeriod()), getTimeLeftMillis(getNextPeriod()));
         }
     }
 
 
-    public void stopServiceAndTimer(){
+    public void onStopButtonClick(){
+        consecutiveFocusPeriod = 0;
+        currentPeriod = PeriodState.NOT_INITIALIZED;
         stopTimer();
         stopForeground(true);
+    }
+
+    public void onStartPauseButtonClick(){
+        if(timerState == TimerState.STARTED) pauseTimer();
+        else startTimer();
+    }
+
+    public void onSkipButtonClick(){
+        stopTimer();
+        startTimer();
     }
 
 
     public PeriodState getNextPeriod(){
         switch (currentPeriod){
             case FOCUS:
-                if (periodsUntilBreak != 0 && consecutiveFocusPeriod >= periodsUntilBreak - 1) return PeriodState.BIG_BREAK;
+                if (periodsUntilBreak != 0 && consecutiveFocusPeriod >= periodsUntilBreak) return PeriodState.BIG_BREAK;
                 else return PeriodState.BREAK;
             case NOT_INITIALIZED:
             case BREAK:
@@ -240,7 +250,7 @@ public class TimerService extends Service {
     private void sendTime(int totalMillis, int millisLeft){
         /* Method sends total time and time left in milliseconds */
         Intent intent = new Intent(ACTION_SEND_TIME);
-        intent.putExtra(BOOLEAN_TIMER_STARTED, true);
+        intent.putExtra(ENUM_TIMER_STATE, timerState);
         intent.putExtra(INT_TIME_MILLIS_LEFT, millisLeft);
         intent.putExtra(INT_TIME_MILLIS_TOTAL, totalMillis);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
@@ -283,6 +293,10 @@ public class TimerService extends Service {
         intent.putExtra(INT_TIME_MILLIS_LEFT, millis);
         intent.putExtra(INT_TIME_MILLIS_TOTAL, millis);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    public TimerState getCurrentTimerState(){
+        return timerState;
     }
 
 
@@ -393,7 +407,7 @@ public class TimerService extends Service {
             } else if(action.equalsIgnoreCase("com.example.app.ACTION_TIMER_PAUSE")){
                 if(thisTimerService != null) thisTimerService.pauseTimer();
             } else if(action.equalsIgnoreCase("com.example.app.ACTION_TIMER_STOP")){
-                if(thisTimerService != null) thisTimerService.stopServiceAndTimer();
+                if(thisTimerService != null) thisTimerService.onStopButtonClick();
             }
         }
     }
