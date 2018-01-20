@@ -148,13 +148,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case STARTED:
                 startButton.setImageResource(R.drawable.ic_pause_white_85_opacity);
                 stopButton.setVisibility(View.VISIBLE);
-                skipButton.setVisibility(View.VISIBLE);
                 break;
             case STOPPED:
                 stopButton.setVisibility(View.INVISIBLE);
             case PAUSED:
                 startButton.setImageResource(R.drawable.ic_play_white_85_opacity);
-                skipButton.setVisibility(View.INVISIBLE);
                 break;
         }
     }

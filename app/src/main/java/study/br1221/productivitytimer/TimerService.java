@@ -189,6 +189,7 @@ public class TimerService extends Service {
 
 
     public void onStopButtonClick(){
+        currentPeriod = PeriodState.NOT_INITIALIZED;
         consecutiveFocusPeriod = 1;
         stopTimer();
         stopForeground(true);
