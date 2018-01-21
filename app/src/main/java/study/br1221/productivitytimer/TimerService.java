@@ -54,8 +54,10 @@ public class TimerService extends Service {
     private static String startActionIntentString = "com.example.app.ACTION_TIMER_START";
     private static String pauseActionIntentString = "com.example.app.ACTION_TIMER_PAUSE";
     private static String stopActionIntentString = "com.example.app.ACTION_TIMER_STOP";
+    private static String skipActionIntentString = "com.example.app.ACTION_TIMER_SKIP";
 
-    private PendingIntent startActionIntent, stopActionIntent, pauseActionIntent, openMainActivityIntent;
+    private PendingIntent startActionIntent, stopActionIntent, pauseActionIntent,
+            openMainActivityIntent, skipActionIntent;
 
 
 
@@ -95,6 +97,7 @@ public class TimerService extends Service {
         intentFilter.addAction(startActionIntentString);
         intentFilter.addAction(pauseActionIntentString);
         intentFilter.addAction(stopActionIntentString);
+        intentFilter.addAction(skipActionIntentString);
         registerReceiver(actionReceiver, intentFilter);
     }
 
@@ -109,9 +112,11 @@ public class TimerService extends Service {
         Intent pauseIntent = new Intent(pauseActionIntentString);
         pauseActionIntent = PendingIntent.getBroadcast(this, 100, pauseIntent, 0);
 
-
         Intent stopIntent = new Intent(stopActionIntentString);
         stopActionIntent = PendingIntent.getBroadcast(this, 100, stopIntent, 0);
+
+        Intent skipIntent = new Intent(skipActionIntentString);
+        skipActionIntent = PendingIntent.getBroadcast(this, 100, skipIntent, 0);
 
     }
 
@@ -180,8 +185,6 @@ public class TimerService extends Service {
                 timerState = TimerState.STOPPED;
                 timerThreadLock.notifyAll();
             }
-            totalMillis = getTimeLeftMillis(getNextPeriod());
-            timeMillisLeft = totalMillis;
 
             sendTime(getTimeLeftMillis(getNextPeriod()), getTimeLeftMillis(getNextPeriod()));
         }
@@ -231,7 +234,6 @@ public class TimerService extends Service {
         int timeLeft = 0;
         switch (period){
             case NOT_INITIALIZED:
-
             case FOCUS:
                 timeLeft = sharedPrefs.getInt("focus_time_minutes", 25);
                 break;
@@ -280,12 +282,20 @@ public class TimerService extends Service {
         Notification.Builder builder =
                 new Notification.Builder(this)
                         .setSmallIcon(R.mipmap.bitmap)
-                        .setContentTitle("running")
-                        .setContentText(getTimeString(timeMillisLeft))
+                        .setContentTitle(getNotificationTitle())
+                        .setContentText(getTimeString(timeMillisLeft) + getString(R.string.notification_text))
                         .setContentIntent(openMainActivityIntent)
-                        .addAction(new Notification.Action(R.drawable.ic_pause_black_24dp, "Pause", pauseActionIntent))
-                        .addAction(new Notification.Action(R.drawable.ic_stop_black_24dp, "Stop", stopActionIntent))
-                        .setProgress(totalMillis, timeMillisLeft, false);
+                        .addAction(new Notification.Action(R.drawable.ic_pause_black_24dp,
+                                getString(R.string.pause_notification_action_title), pauseActionIntent))
+                        .addAction(new Notification.Action(R.drawable.ic_skip_next_black_24dp,
+                                getString(R.string.skip_notification_action_title), skipActionIntent))
+                        .addAction(new Notification.Action(R.drawable.ic_stop_black_24dp,
+                                getString(R.string.stop_notification_action_title), stopActionIntent))
+                        .setProgress(totalMillis, timeMillisLeft, false)
+                        .setVisibility(Notification.VISIBILITY_PUBLIC)
+                        .setPriority(Notification.PRIORITY_MAX)
+                        .setCategory(Notification.CATEGORY_ALARM);
+
         startForeground(timerNotificationId, builder.build());
     }
 
@@ -293,11 +303,19 @@ public class TimerService extends Service {
         Notification.Builder builder =
                 new Notification.Builder(this)
                         .setSmallIcon(R.mipmap.bitmap)
-                        .setContentTitle("paused")
-                        .setContentText(getTimeString(timeMillisLeft))
+                        .setContentTitle(getNotificationTitle())
+                        .setContentText(getTimeString(timeMillisLeft) + getString(R.string.notification_text))
                         .setContentIntent(openMainActivityIntent)
-                        .addAction(new Notification.Action(R.drawable.ic_play_arrow_black_24dp, "Resume", startActionIntent))
-                        .addAction(new Notification.Action(R.drawable.ic_stop_black_24dp, "Stop", stopActionIntent));
+                        .addAction(new Notification.Action(R.drawable.ic_play_arrow_black_24dp,
+                                getString(R.string.resume_notification_action_title), startActionIntent))
+                        .addAction(new Notification.Action(R.drawable.ic_skip_next_black_24dp,
+                                getString(R.string.skip_notification_action_title), skipActionIntent))
+                        .addAction(new Notification.Action(R.drawable.ic_stop_black_24dp,
+                                getString(R.string.stop_notification_action_title), stopActionIntent))
+                        .setVisibility(Notification.VISIBILITY_PUBLIC)
+                        .setPriority(Notification.PRIORITY_MAX)
+                        .setCategory(Notification.CATEGORY_ALARM);
+
         startForeground(timerNotificationId, builder.build());
     }
 
@@ -308,12 +326,27 @@ public class TimerService extends Service {
                         .setContentTitle("finished")
                         .setContentText("finished")
                         .setContentIntent(openMainActivityIntent)
-                        .addAction(new Notification.Action(R.drawable.ic_play_arrow_black_24dp, "Start", startActionIntent))
-                        .addAction(new Notification.Action(R.drawable.ic_stop_black_24dp, "Stop", stopActionIntent))
+                        .addAction(new Notification.Action(R.drawable.ic_play_arrow_black_24dp,
+                                getString(R.string.start_notification_action_title), startActionIntent))
+                        .addAction(new Notification.Action(R.drawable.ic_skip_next_black_24dp,
+                                getString(R.string.skip_notification_action_title), skipActionIntent))
+                        .addAction(new Notification.Action(R.drawable.ic_stop_black_24dp,
+                                getString(R.string.stop_notification_action_title), stopActionIntent))
+                        .setVisibility(Notification.VISIBILITY_PUBLIC)
                         .setDefaults(Notification.DEFAULT_ALL)
-                        .setPriority(Notification.PRIORITY_MAX);
+                        .setPriority(Notification.PRIORITY_MAX)
+                        .setCategory(Notification.CATEGORY_ALARM);
 
         startForeground(timerNotificationId, builder.build());
+    }
+
+    private String getNotificationTitle(){
+        switch(currentPeriod){
+            case FOCUS: return getString(R.string.work_time_notification_title);
+            case BIG_BREAK:
+            case BREAK: return getString(R.string.break_time_notification_title);
+        }
+        return null;
     }
 
     private String getTimeString(int millis){
@@ -363,12 +396,17 @@ public class TimerService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if(action.equalsIgnoreCase("com.example.app.ACTION_TIMER_START")){
+            if(action.equalsIgnoreCase(startActionIntentString)){
                 if(thisTimerService != null) thisTimerService.startTimer();
-            } else if(action.equalsIgnoreCase("com.example.app.ACTION_TIMER_PAUSE")){
+            } else if(action.equalsIgnoreCase(pauseActionIntentString)){
                 if(thisTimerService != null) thisTimerService.pauseTimer();
-            } else if(action.equalsIgnoreCase("com.example.app.ACTION_TIMER_STOP")){
+            } else if(action.equalsIgnoreCase(stopActionIntentString)){
                 if(thisTimerService != null) thisTimerService.onStopButtonClick();
+            } else if(action.equalsIgnoreCase(skipActionIntentString)){
+                if(thisTimerService != null) {
+                    thisTimerService.onSkipButtonClick();
+                    thisTimerService.startTimer();
+                }
             }
         }
     }

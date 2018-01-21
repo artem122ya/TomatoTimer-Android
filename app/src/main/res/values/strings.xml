@@ -15,4 +15,12 @@
     <string name="stop_button_content_description">Stop button.</string>
     <string name="start_and_pause_button_content_description">Start or pause button.</string>
     <string name="skip_button_content_description">Skip button.</string>
+    <string name="work_time_notification_title">Work Time</string>
+    <string name="break_time_notification_title">Break Time</string>
+    <string name="notification_text">" left"</string>
+    <string name="start_notification_action_title">Start</string>
+    <string name="pause_notification_action_title">Pause</string>
+    <string name="skip_notification_action_title">Skip</string>
+    <string name="stop_notification_action_title">Stop</string>
+    <string name="resume_notification_action_title">Resume</string>
 </resources>
