@@ -12,7 +12,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import java.util.concurrent.TimeUnit;
@@ -41,7 +40,6 @@ public class TimerView extends View {
 
     private ValueAnimator timerAnimator, drawAnimator;
     boolean animatingTimer = false;
-    boolean animatingDraw = false;
     int animationDrawDuration = 300;
 
     private String currentTimerString = "00:00";
@@ -53,7 +51,6 @@ public class TimerView extends View {
 
     private int viewMarginPixels;
 
-    private int currentTotalMillis = 0;
 
 
     public TimerView(Context context) {
@@ -192,8 +189,6 @@ public class TimerView extends View {
 
 
     public void setTime(int timeMillisTotal, int timeMillisLeft){
-        checkTotalMillis(timeMillisTotal);
-        stopDrawAnimation();
         switch (timerState){
             case STARTED:
                 drawWhenStarted(timeMillisTotal, timeMillisLeft);
@@ -208,13 +203,6 @@ public class TimerView extends View {
 
     }
 
-
-    private void checkTotalMillis(int totalMillis){
-        if(totalMillis != currentTotalMillis){
-            timerState = TimerState.STOPPED;
-            currentTotalMillis = totalMillis;
-        }
-    }
 
 
 
@@ -232,7 +220,6 @@ public class TimerView extends View {
     private void drawWhenStopped(int timeMillisTotal, int timeMillisLeft){
         if (animatingTimer){
             stopAnimation();
-            animatingTimer = false;
         }
         float newSweepAngle = getNewSweepAngle(timeMillisTotal, timeMillisLeft);
         animateDrawArc(animationDrawDuration, newSweepAngle);
@@ -244,12 +231,6 @@ public class TimerView extends View {
         return initialArcSweepAngle * anglePercentage;
     }
 
-    private void stopDrawAnimation(){
-        if (animatingDraw){
-            drawAnimator.cancel();
-            animatingDraw = false;
-        }
-    }
 
     private void animateDrawArc(int durationMillis, float destinationAngle){
         if (firstDraw) {
@@ -336,5 +317,6 @@ public class TimerView extends View {
     public void updateTimer(int millisTotal, int millisLeft){
         setTime(millisTotal, millisLeft);
     }
+
 
 }

@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onRestart() {
         // Redraw timerView in case any settings changed
         super.onRestart();
+        timerView.stopAnimation();
         updateButtons(timerService.getCurrentTimerState());
         initializeTimerView();
     }
