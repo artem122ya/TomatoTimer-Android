@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="study.br1221.productivitytimer">
+    package="artem122ya.tomatotimer">
 
     <application
         android:allowBackup="true"

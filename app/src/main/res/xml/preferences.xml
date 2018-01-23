@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:custom="study.br1221.productivitytimer">
+    xmlns:custom="artem122ya.tomatotimer">
 
     <PreferenceCategory android:title="@string/timer_preference_category_title" >
-        <study.br1221.productivitytimer.NumberPickerDialogPreference
+        <artem122ya.tomatotimer.NumberPickerDialogPreference
             android:key="focus_time_minutes"
             android:title="@string/focus_minute_picker_title"
             android:defaultValue="25"
@@ -11,7 +11,7 @@
             custom:min_value="0"
             custom:max_value="120"/>
 
-        <study.br1221.productivitytimer.NumberPickerDialogPreference
+        <artem122ya.tomatotimer.NumberPickerDialogPreference
             android:key="small_break_time_minutes"
             android:title="@string/small_break_minute_picker_title"
             android:defaultValue="5"
@@ -20,7 +20,7 @@
             custom:max_value="60"
             />
 
-        <study.br1221.productivitytimer.NumberPickerDialogPreference
+        <artem122ya.tomatotimer.NumberPickerDialogPreference
             android:key="big_break_time_minutes"
             android:title="@string/big_break_minute_picker_title"
             android:defaultValue="15"
@@ -28,7 +28,7 @@
             custom:min_value="0"
             custom:max_value="120"/>
 
-        <study.br1221.productivitytimer.NumberPickerDialogPreference
+        <artem122ya.tomatotimer.NumberPickerDialogPreference
             android:key="sessions_until_big_break"
             android:title="@string/sessions_until_big_break_title"
             android:defaultValue="4"

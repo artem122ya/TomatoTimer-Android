@@ -1,4 +1,4 @@
-package study.br1221.productivitytimer;
+package artem122ya.tomatotimer;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -16,8 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
-import study.br1221.productivitytimer.TimerService.TimerState;
-import study.br1221.productivitytimer.views.TimerView;
+import artem122ya.tomatotimer.TimerService.TimerState;
+import artem122ya.tomatotimer.views.TimerView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 

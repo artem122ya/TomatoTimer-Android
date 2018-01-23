@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
 
-    <study.br1221.productivitytimer.views.TimerView
+    <artem122ya.tomatotimer.views.TimerView
         android:id="@+id/timerView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

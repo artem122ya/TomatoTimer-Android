@@ -1,4 +1,4 @@
-package study.br1221.productivitytimer.views;
+package artem122ya.tomatotimer.views;
 
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
@@ -16,7 +16,7 @@ import android.view.View;
 
 import java.util.concurrent.TimeUnit;
 
-import study.br1221.productivitytimer.R;
+import artem122ya.tomatotimer.R;
 
 
 

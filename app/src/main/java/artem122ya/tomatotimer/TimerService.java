@@ -1,4 +1,4 @@
-package study.br1221.productivitytimer;
+package artem122ya.tomatotimer;
 
 import android.app.Notification;
 import android.app.PendingIntent;

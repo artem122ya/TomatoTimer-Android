@@ -1,4 +1,4 @@
-package study.br1221.productivitytimer;
+package artem122ya.tomatotimer;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -12,7 +12,7 @@ import android.widget.NumberPicker;
 
 public class NumberPickerDialogPreference extends DialogPreference {
 
-    public static String attributeNamespace = "study.br1221.productivitytimer";
+    public static String attributeNamespace = "artem122ya.tomatotimer";
 
     // allowed range
     public int maxValue;
