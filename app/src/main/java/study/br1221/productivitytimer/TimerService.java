@@ -41,7 +41,7 @@ public class TimerService extends Service {
 
 
     private enum PeriodState {FOCUS, BREAK, BIG_BREAK, NOT_INITIALIZED}
-    private PeriodState currentPeriod = PeriodState.NOT_INITIALIZED;
+    private volatile PeriodState currentPeriod = PeriodState.NOT_INITIALIZED;
     private int consecutiveFocusPeriod = 1;
     private int periodsUntilBreak = 3;
 
@@ -282,7 +282,7 @@ public class TimerService extends Service {
         Notification.Builder builder =
                 new Notification.Builder(this)
                         .setSmallIcon(R.mipmap.bitmap)
-                        .setContentTitle(getNotificationTitle())
+                        .setContentTitle(getSessionName(currentPeriod))
                         .setContentText(getTimeString(timeMillisLeft) + getString(R.string.notification_text))
                         .setContentIntent(openMainActivityIntent)
                         .addAction(new Notification.Action(R.drawable.ic_pause_black_24dp,
@@ -303,7 +303,7 @@ public class TimerService extends Service {
         Notification.Builder builder =
                 new Notification.Builder(this)
                         .setSmallIcon(R.mipmap.bitmap)
-                        .setContentTitle(getNotificationTitle())
+                        .setContentTitle(getSessionName(currentPeriod))
                         .setContentText(getTimeString(timeMillisLeft) + getString(R.string.notification_text))
                         .setContentIntent(openMainActivityIntent)
                         .addAction(new Notification.Action(R.drawable.ic_play_arrow_black_24dp,
@@ -323,8 +323,8 @@ public class TimerService extends Service {
         Notification.Builder builder =
                 new Notification.Builder(this)
                         .setSmallIcon(R.mipmap.bitmap)
-                        .setContentTitle("finished")
-                        .setContentText("finished")
+                        .setContentTitle(getSessionName(currentPeriod) + getString(R.string.finished_notification_title))
+                        .setContentText(getString(R.string.finished_notification_text) + getSessionName(getNextPeriod()) + "?")
                         .setContentIntent(openMainActivityIntent)
                         .addAction(new Notification.Action(R.drawable.ic_play_arrow_black_24dp,
                                 getString(R.string.start_notification_action_title), startActionIntent))
@@ -340,14 +340,17 @@ public class TimerService extends Service {
         startForeground(timerNotificationId, builder.build());
     }
 
-    private String getNotificationTitle(){
-        switch(currentPeriod){
-            case FOCUS: return getString(R.string.work_time_notification_title);
-            case BIG_BREAK:
-            case BREAK: return getString(R.string.break_time_notification_title);
+    private String getSessionName(PeriodState period){
+        switch(period){
+            case FOCUS: return getString(R.string.work_time_notification_text);
+            case BIG_BREAK: return getString(R.string.big_break_notification_text);
+            case BREAK: return getString(R.string.break_time_notification_text);
         }
-        return null;
+        return "";
     }
+
+
+
 
     private String getTimeString(int millis){
         long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
