@@ -24,6 +24,10 @@
     <string name="stop_notification_action_title">Stop</string>
     <string name="resume_notification_action_title">Resume</string>
     <string name="big_break_notification_text">Big break</string>
-    <string name="finished_notification_title">finished</string>
-    <string name="finished_notification_text">Want to start a</string>
+    <string name="finished_notification_title">" finished"</string>
+    <string name="finished_notification_text">"Want to start a "</string>
+    <string name="focus_time_minutes_default_value">25</string>
+    <string name="small_break_time_minutes_default_value">5</string>
+    <string name="big_break_time_minutes_default_value">15</string>
+    <string name="sessions_until_big_break_default_value">4</string>
 </resources>
