@@ -53,6 +53,8 @@ public class TimerView extends View {
 
     private int viewMarginPixels;
 
+    private int currentTotalMillis = 0;
+
 
     public TimerView(Context context) {
         super(context);
@@ -190,6 +192,7 @@ public class TimerView extends View {
 
 
     public void setTime(int timeMillisTotal, int timeMillisLeft){
+        checkTotalMillis(timeMillisTotal);
         stopDrawAnimation();
         switch (timerState){
             case STARTED:
@@ -204,6 +207,15 @@ public class TimerView extends View {
         setCurrentTimerString(getTimeString(timeMillisLeft));
 
     }
+
+
+    private void checkTotalMillis(int totalMillis){
+        if(totalMillis != currentTotalMillis){
+            timerState = TimerState.STOPPED;
+            currentTotalMillis = totalMillis;
+        }
+    }
+
 
 
     private void drawWhenStarted(int timeMillisTotal, int timeMillisLeft){
