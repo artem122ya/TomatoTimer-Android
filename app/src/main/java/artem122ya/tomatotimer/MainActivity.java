@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onStop() {
         super.onStop();
+        unbindService(serviceConnection);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(onEvent);
     }
 
