@@ -280,7 +280,7 @@ public class TimerView extends View {
 
 
     public void stopAnimation(){
-        timerAnimator.cancel();
+       if (timerAnimator != null) timerAnimator.cancel();
         animatingTimer = false;
     }
 
