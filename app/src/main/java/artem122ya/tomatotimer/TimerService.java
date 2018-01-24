@@ -32,7 +32,7 @@ public class TimerService extends Service {
 
     int timerNotificationId = 135001;
 
-    private TimerActionReceiver actionReceiver = new TimerActionReceiver();
+    private FocusTimerActionReceiver actionReceiver = new FocusTimerActionReceiver();
 
     private final IBinder iBinder = new LocalBinder();
 
@@ -401,7 +401,7 @@ public class TimerService extends Service {
     }
 
 
-    public static class TimerActionReceiver extends BroadcastReceiver {
+    public static class FocusTimerActionReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
