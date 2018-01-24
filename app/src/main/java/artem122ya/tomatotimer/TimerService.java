@@ -285,7 +285,8 @@ public class TimerService extends Service {
     private void timerRunningNotification(){
         Notification.Builder builder =
                 new Notification.Builder(this)
-                        .setSmallIcon(R.mipmap.bitmap)
+                        .setSmallIcon(R.mipmap.ic_notification_icon)
+                        .setColor(getResources().getColor(R.color.colorPrimary))
                         .setContentTitle(getSessionName(currentPeriod))
                         .setContentText(getTimeString(timeMillisLeft) + getString(R.string.notification_text))
                         .setContentIntent(openMainActivityIntent)
@@ -306,7 +307,8 @@ public class TimerService extends Service {
     private void timerPausedNotification(){
         Notification.Builder builder =
                 new Notification.Builder(this)
-                        .setSmallIcon(R.mipmap.bitmap)
+                        .setSmallIcon(R.mipmap.ic_notification_icon)
+                        .setColor(getResources().getColor(R.color.colorPrimary))
                         .setContentTitle(getSessionName(currentPeriod))
                         .setContentText(getTimeString(timeMillisLeft) + getString(R.string.notification_text))
                         .setContentIntent(openMainActivityIntent)
@@ -326,7 +328,8 @@ public class TimerService extends Service {
     private void timerFinishedNotification(){
         Notification.Builder builder =
                 new Notification.Builder(this)
-                        .setSmallIcon(R.mipmap.bitmap)
+                        .setSmallIcon(R.mipmap.ic_notification_icon)
+                        .setColor(getResources().getColor(R.color.colorPrimary))
                         .setContentTitle(getSessionName(currentPeriod) + getString(R.string.finished_notification_title))
                         .setContentText(getString(R.string.finished_notification_text) + getSessionName(getNextPeriod()) + "?")
                         .setContentIntent(openMainActivityIntent)
