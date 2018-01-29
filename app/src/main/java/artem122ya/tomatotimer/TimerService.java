@@ -17,10 +17,10 @@ import java.util.concurrent.TimeUnit;
 
 public class TimerService extends Service {
 
-    public static String ACTION_SEND_TIME = "time_send";
-    public static String INT_TIME_MILLIS_LEFT = "time_extra_millis_left";
-    public static String INT_TIME_MILLIS_TOTAL = "time_extra_millis_total";
-    public static String ENUM_TIMER_STATE = "timer_state";
+    public static String ACTION_SEND_TIME = "artem122ya.tomatotimer.time_send";
+    public static String INT_TIME_MILLIS_LEFT = "artem122ya.tomatotimer.time_extra_millis_left";
+    public static String INT_TIME_MILLIS_TOTAL = "artem122ya.tomatotimer.time_extra_millis_total";
+    public static String ENUM_TIMER_STATE = "artem122ya.tomatotimer.timer_state";
 
 
     public enum TimerState {STARTED, PAUSED, STOPPED}
@@ -51,10 +51,10 @@ public class TimerService extends Service {
     private volatile long stopTimeMillis = 0;
 
 
-    private static String startActionIntentString = "com.example.app.ACTION_TIMER_START";
-    private static String pauseActionIntentString = "com.example.app.ACTION_TIMER_PAUSE";
-    private static String stopActionIntentString = "com.example.app.ACTION_TIMER_STOP";
-    private static String skipActionIntentString = "com.example.app.ACTION_TIMER_SKIP";
+    private static String startActionIntentString = "artem122ya.tomatotimer.ACTION_TIMER_START";
+    private static String pauseActionIntentString = "artem122ya.tomatotimer.ACTION_TIMER_PAUSE";
+    private static String stopActionIntentString = "artem122ya.tomatotimer.ACTION_TIMER_STOP";
+    private static String skipActionIntentString = "artem122ya.tomatotimer.ACTION_TIMER_SKIP";
 
     private PendingIntent startActionIntent, stopActionIntent, pauseActionIntent,
             openMainActivityIntent, skipActionIntent;
