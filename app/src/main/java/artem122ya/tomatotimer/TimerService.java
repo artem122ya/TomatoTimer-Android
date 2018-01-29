@@ -40,9 +40,9 @@ public class TimerService extends Service {
 
 
 
-    private enum PeriodState {FOCUS, BREAK, BIG_BREAK, NOT_INITIALIZED}
-    private volatile PeriodState currentPeriod = PeriodState.NOT_INITIALIZED;
-    private int consecutiveFocusPeriod = 1;
+    public enum PeriodState {FOCUS, BREAK, BIG_BREAK, NOT_INITIALIZED}
+    public volatile PeriodState currentPeriod = PeriodState.NOT_INITIALIZED;
+    public int consecutiveFocusPeriod = 1;
     private int periodsUntilBreak = 3;
 
     private volatile int timeMillisLeft = 0;
@@ -123,7 +123,11 @@ public class TimerService extends Service {
     @Override
     public void onDestroy() {
         stopTimer();
-        unregisterReceiver(actionReceiver);
+        try {
+            unregisterReceiver(actionReceiver);
+        } catch (IllegalArgumentException e){
+
+        }
     }
 
     public void startTimer(){
