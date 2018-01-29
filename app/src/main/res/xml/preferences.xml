@@ -3,7 +3,7 @@
     xmlns:custom="artem122ya.tomatotimer">
 
     <PreferenceCategory android:title="@string/timer_preference_category_title" >
-        <artem122ya.tomatotimer.NumberPickerDialogPreference
+        <artem122ya.tomatotimer.settings.NumberPickerDialogPreference
             android:key="focus_time_minutes"
             android:title="@string/focus_minute_picker_title"
             android:defaultValue="@string/focus_time_minutes_default_value"
@@ -11,7 +11,7 @@
             custom:min_value="0"
             custom:max_value="120"/>
 
-        <artem122ya.tomatotimer.NumberPickerDialogPreference
+        <artem122ya.tomatotimer.settings.NumberPickerDialogPreference
             android:key="small_break_time_minutes"
             android:title="@string/small_break_minute_picker_title"
             android:defaultValue="@string/small_break_time_minutes_default_value"
@@ -20,7 +20,7 @@
             custom:max_value="60"
             />
 
-        <artem122ya.tomatotimer.NumberPickerDialogPreference
+        <artem122ya.tomatotimer.settings.NumberPickerDialogPreference
             android:key="big_break_time_minutes"
             android:title="@string/big_break_minute_picker_title"
             android:defaultValue="@string/big_break_time_minutes_default_value"
@@ -28,7 +28,7 @@
             custom:min_value="0"
             custom:max_value="120"/>
 
-        <artem122ya.tomatotimer.NumberPickerDialogPreference
+        <artem122ya.tomatotimer.settings.NumberPickerDialogPreference
             android:key="sessions_until_big_break"
             android:title="@string/sessions_until_big_break_title"
             android:defaultValue="@string/sessions_until_big_break_default_value"
