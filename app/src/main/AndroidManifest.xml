@@ -23,17 +23,6 @@
             android:enabled="true"
             android:exported="true" />
 
-        <receiver
-            android:name=".TimerService$FocusTimerActionReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="artem122ya.tomatotimer.ACTION_TIMER_START" />
-                <action android:name="artem122ya.tomatotimer.ACTION_TIMER_PAUSE" />
-                <action android:name="artem122ya.tomatotimer.ACTION_TIMER_STOP" />
-                <action android:name="artem122ya.tomatotimer.ACTION_TIMER_SKIP" />
-            </intent-filter>
-        </receiver>
 
         <activity
             android:name=".settings.SettingsActivity"
