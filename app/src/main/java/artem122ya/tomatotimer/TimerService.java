@@ -42,7 +42,7 @@ public class TimerService extends Service {
 
     public enum PeriodState {FOCUS, BREAK, BIG_BREAK, NOT_INITIALIZED}
     public volatile PeriodState currentPeriod = PeriodState.NOT_INITIALIZED;
-    public int consecutiveFocusPeriod = 1;
+    public int consecutiveFocusPeriod = 0;
     private int periodsUntilBreak = 3;
 
     private volatile int timeMillisLeft = 0;
@@ -159,7 +159,7 @@ public class TimerService extends Service {
         if (currentPeriod == PeriodState.FOCUS){
             consecutiveFocusPeriod++;
         } else if (currentPeriod == PeriodState.BIG_BREAK){
-            consecutiveFocusPeriod = 1;
+            consecutiveFocusPeriod = 0;
         }
     }
 
@@ -167,7 +167,7 @@ public class TimerService extends Service {
     private void checkNumberOfSessionsUntilBreak(){
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         periodsUntilBreak = sharedPrefs.getInt("sessions_until_big_break",
-                Integer.valueOf(getString(R.string.sessions_until_big_break_default_value)) + 1);
+                Integer.valueOf(getString(R.string.sessions_until_big_break_default_value)));
     }
 
 
@@ -198,7 +198,7 @@ public class TimerService extends Service {
 
     public void onStopButtonClick(){
         currentPeriod = PeriodState.NOT_INITIALIZED;
-        consecutiveFocusPeriod = 1;
+        consecutiveFocusPeriod = 0;
         stopTimer();
         stopForeground(true);
     }
@@ -215,6 +215,7 @@ public class TimerService extends Service {
                 sendTime(getTimeLeftMillis(getNextPeriod()), getTimeLeftMillis(getNextPeriod()));
             } else {
                 stopTimer();
+                stopForeground(true);
             }
 
         }
