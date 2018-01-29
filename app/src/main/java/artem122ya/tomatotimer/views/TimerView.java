@@ -207,25 +207,18 @@ public class TimerView extends View {
 
 
     private boolean isAnimationEnabled(){
-        float duration, transition;
-        duration = Settings.Global.getFloat(
-                getContext().getContentResolver(),
-                Settings.Global.ANIMATOR_DURATION_SCALE, 1);
-        transition = Settings.Global.getFloat(
-                getContext().getContentResolver(),
-                Settings.Global.TRANSITION_ANIMATION_SCALE, 1);
-        return (duration != 0 && transition != 0);
-
+        return getAnimationDurationScale() != 0;
     }
 
 
 
     private void drawWhenStarted(int timeMillisTotal, int timeMillisLeft){
         if (!animatingTimer){
-            timeMillisLeft = timeMillisLeft <= 0 ? 0 : timeMillisLeft - animationDrawDuration;
+            int scaledDrawDurationMillis =(int) (animationDrawDuration / getAnimationDurationScale());
+            timeMillisLeft = timeMillisLeft <= 0 ? 0 : timeMillisLeft - scaledDrawDurationMillis;
             float newSweepAngle = getNewSweepAngle(timeMillisTotal, timeMillisLeft);
-            animateDrawArc(animationDrawDuration, newSweepAngle);
-            animateArc(timeMillisLeft, animationDrawDuration, newSweepAngle);
+            animateDrawArc(scaledDrawDurationMillis, newSweepAngle);
+            animateArc(timeMillisLeft, scaledDrawDurationMillis, newSweepAngle);
             animatingTimer = true;
         }
     }
@@ -236,7 +229,7 @@ public class TimerView extends View {
             stopAnimation();
         }
         float newSweepAngle = getNewSweepAngle(timeMillisTotal, timeMillisLeft);
-        animateDrawArc(animationDrawDuration, newSweepAngle);
+        animateDrawArc((int) (animationDrawDuration / getAnimationDurationScale()), newSweepAngle);
     }
 
 
@@ -286,9 +279,15 @@ public class TimerView extends View {
                 return v;
             }
         });
-        timerAnimator.setDuration(durationMillis);
+        timerAnimator.setDuration((long) (durationMillis / getAnimationDurationScale()));
         timerAnimator.setStartDelay(delayMillis);
         timerAnimator.start();
+    }
+
+    public float getAnimationDurationScale(){
+        return Settings.Global.getFloat(
+                getContext().getContentResolver(),
+                Settings.Global.ANIMATOR_DURATION_SCALE, 1);
     }
 
 
