@@ -11,6 +11,7 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -189,20 +190,33 @@ public class TimerView extends View {
 
 
     public void setTime(int timeMillisTotal, int timeMillisLeft){
-        switch (timerState){
-            case STARTED:
-                drawWhenStarted(timeMillisTotal, timeMillisLeft);
-                break;
-            case PAUSED:
-            case STOPPED:
-                drawWhenStopped(timeMillisTotal, timeMillisLeft);
-                break;
-        }
-
+        if (isAnimationEnabled()) {
+            switch (timerState) {
+                case STARTED:
+                    drawWhenStarted(timeMillisTotal, timeMillisLeft);
+                    break;
+                case PAUSED:
+                case STOPPED:
+                    drawWhenStopped(timeMillisTotal, timeMillisLeft);
+                    break;
+            }
+        } else setArcSweepAngle(getNewSweepAngle(timeMillisTotal, timeMillisLeft));
         setCurrentTimerString(getTimeString(timeMillisLeft));
 
     }
 
+
+    private boolean isAnimationEnabled(){
+        float duration, transition;
+        duration = Settings.Global.getFloat(
+                getContext().getContentResolver(),
+                Settings.Global.ANIMATOR_DURATION_SCALE, 1);
+        transition = Settings.Global.getFloat(
+                getContext().getContentResolver(),
+                Settings.Global.TRANSITION_ANIMATION_SCALE, 1);
+        return (duration != 0 && transition != 0);
+
+    }
 
 
 
