@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import artem122ya.tomatotimer.TimerService.TimerState;
+import artem122ya.tomatotimer.settings.SettingsActivity;
 import artem122ya.tomatotimer.views.TimerView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {

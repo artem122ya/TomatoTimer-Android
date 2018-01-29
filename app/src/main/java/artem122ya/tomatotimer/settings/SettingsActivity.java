@@ -1,4 +1,4 @@
-package artem122ya.tomatotimer;
+package artem122ya.tomatotimer.settings;
 
 
 import android.content.SharedPreferences;
@@ -6,18 +6,14 @@ import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.MenuItem;
-import android.view.View;
+
+import artem122ya.tomatotimer.R;
 
 
 public class SettingsActivity extends AppCompatActivity {

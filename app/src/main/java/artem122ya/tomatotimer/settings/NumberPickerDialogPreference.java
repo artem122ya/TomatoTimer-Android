@@ -1,4 +1,4 @@
-package artem122ya.tomatotimer;
+package artem122ya.tomatotimer.settings;
 
 import android.content.Context;
 import android.content.res.TypedArray;
