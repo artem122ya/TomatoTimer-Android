@@ -195,6 +195,18 @@ public class TimerService extends Service {
         }
     }
 
+    public void skipPeriod(){
+        synchronized (timerThreadLock) {
+            if (timerState == TimerState.STOPPED) {
+                moveToNextPeriod();
+                sendTime(getTimeLeftMillis(getNextPeriod()), getTimeLeftMillis(getNextPeriod()));
+            } else {
+                stopTimer();
+            }
+
+        }
+    }
+
 
     public void onStopButtonClick(){
         currentPeriod = PeriodState.NOT_INITIALIZED;
@@ -208,17 +220,9 @@ public class TimerService extends Service {
         else startTimer();
     }
 
-    public void onSkipButtonClick(){
-        synchronized (timerThreadLock) {
-            if (timerState == TimerState.STOPPED) {
-                moveToNextPeriod();
-                sendTime(getTimeLeftMillis(getNextPeriod()), getTimeLeftMillis(getNextPeriod()));
-            } else {
-                stopTimer();
-                stopForeground(true);
-            }
-
-        }
+    public void onSkipButtonClickInActivity(){
+        skipPeriod();
+        stopForeground(true);
     }
 
 
@@ -419,7 +423,7 @@ public class TimerService extends Service {
                 if(thisTimerService != null) thisTimerService.onStopButtonClick();
             } else if(action.equalsIgnoreCase(skipActionIntentString)){
                 if(thisTimerService != null) {
-                    thisTimerService.onSkipButtonClick();
+                    thisTimerService.skipPeriod();
                     thisTimerService.startTimer();
                 }
             }

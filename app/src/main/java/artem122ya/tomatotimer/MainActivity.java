@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (view == stopButton) {
             timerService.onStopButtonClick();
         } else if (view == skipButton) {
-            timerService.onSkipButtonClick();
+            timerService.onSkipButtonClickInActivity();
         }
     }
 
