@@ -1,39 +1,25 @@
 package artem122ya.tomatotimer;
 
-import android.content.Intent;
-import android.os.IBinder;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.rule.ServiceTestRule;
-import android.support.test.runner.AndroidJUnit4;
-
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
 
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
 
 
-
-
-@RunWith(AndroidJUnit4.class)
+@RunWith(RobolectricTestRunner.class)
 public class TimerServiceTest {
 
-    TimerService timerService;
-
-    @Rule
-    public final ServiceTestRule mServiceRule = new ServiceTestRule();
+    private TimerService timerService;
 
 
     @Before
     public void bindService() throws TimeoutException{
-        Intent intent = new Intent(InstrumentationRegistry.getTargetContext(), TimerService.class);
-
-        IBinder binder = mServiceRule.bindService(intent);
-
-        timerService = ((TimerService.LocalBinder) binder).getService();
+        timerService = Robolectric.buildService(TimerService.class).get();
     }
 
 
