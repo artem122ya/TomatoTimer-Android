@@ -18,40 +18,26 @@ import android.view.View;
 import java.util.concurrent.TimeUnit;
 
 import artem122ya.tomatotimer.R;
-
+import artem122ya.tomatotimer.TimerService.TimerState;
 
 
 public class TimerView extends View {
-    private int arcWidth;
     private Paint backgroundArcPaint, foregroundArcPaint, timerTextPaint;
-    private RectF arcRect;
     private int viewWidth, viewHeight;
-
-    private float anglePercentage = 1;
-
     private Path backgroundArcPath, foregroundArcPath;
-
-
     private Rect viewRect = new Rect();
 
     private int initialArcSweepAngle = 270;
     private int initialArcStartAngle = 135;
-
-    private float arcSweepAngle = 0;
+    private volatile float currentArcSweepAngle = initialArcSweepAngle;
 
     private ValueAnimator timerAnimator, drawAnimator;
     boolean animatingTimer = false;
     int animationDrawDuration = 300;
 
-    private String currentTimerString = "00:00";
-
-    private enum TimerState {STARTED, PAUSED, STOPPED}
-    private volatile TimerState timerState = TimerState.STOPPED;
-
+    private String displayedTime = "00:00";
+    private volatile TimerState currentTimerState = TimerState.STOPPED;
     private boolean firstDraw = true;
-
-    private int viewMarginPixels;
-
 
 
     public TimerView(Context context) {
@@ -59,10 +45,12 @@ public class TimerView extends View {
         init(context,null);
     }
 
+
     public TimerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
+
 
     public TimerView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -81,21 +69,14 @@ public class TimerView extends View {
     }
 
 
-
     private void init(Context context, AttributeSet attrs) {
         createPaint();
 
-
-
-
-        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.TimerView, 0, 0);
-        try {
-            applyAttrs(a);
-        } catch (EnumConstantNotPresentException e){
-            applyDefaultAttrs();
-        }
-
+        TypedArray a = context.getTheme()
+                .obtainStyledAttributes(attrs, R.styleable.TimerView, 0, 0);
+        applyAttrs(a);
     }
+
 
     private void createPaint(){
         backgroundArcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -114,14 +95,10 @@ public class TimerView extends View {
 
     }
 
+
     private void applyAttrs(TypedArray a){
         foregroundArcPaint.setColor(a.getColor(R.styleable.TimerView_foreground_arc_color, Color.GRAY));
         backgroundArcPaint.setColor(a.getColor(R.styleable.TimerView_background_arc_color, Color.RED));
-    }
-
-    private void applyDefaultAttrs(){
-        backgroundArcPaint.setColor(Color.RED);
-        foregroundArcPaint.setColor(Color.GREEN);
     }
 
 
@@ -135,18 +112,17 @@ public class TimerView extends View {
 
         drawTimeText(canvas);
 
-
 }
 
 
     private void drawTimeText(Canvas canvas){
         float pixelTextSize = viewWidth/ 6;
         timerTextPaint.setTextSize(pixelTextSize);
-        drawCenter(canvas, timerTextPaint, currentTimerString);
+        drawStringInCenterOfView(canvas, timerTextPaint, displayedTime);
     }
 
 
-    private void drawCenter(Canvas canvas, Paint paint, String text) {
+    private void drawStringInCenterOfView(Canvas canvas, Paint paint, String text) {
         canvas.getClipBounds(viewRect);
         int cHeight = viewRect.height();
         int cWidth = viewRect.width();
@@ -164,10 +140,11 @@ public class TimerView extends View {
         viewHeight = getHeight();
 
         //create margin
-        viewMarginPixels = viewWidth / 14;
+        int viewMarginPixels = viewWidth / 14;
 
         //create arc rect with 100px margin
-        arcRect = new RectF(viewMarginPixels, viewMarginPixels, viewWidth - viewMarginPixels, viewHeight - viewMarginPixels);
+        RectF arcRect = new RectF(viewMarginPixels, viewMarginPixels,
+                viewWidth - viewMarginPixels, viewHeight - viewMarginPixels);
 
         //create background arc
         backgroundArcPath = new Path();
@@ -175,34 +152,41 @@ public class TimerView extends View {
 
         //create foreground arc
         foregroundArcPath = new Path();
-        foregroundArcPath.arcTo(arcRect, initialArcStartAngle, arcSweepAngle);
+        foregroundArcPath.arcTo(arcRect, initialArcStartAngle, currentArcSweepAngle);
 
         //set arcWidth
-        arcWidth = viewWidth / 22;
-        backgroundArcPaint.setStrokeWidth(arcWidth*0.95f); // *0.95f so there is no antialiasing overlap
+        int arcWidth = viewWidth / 22;
+        backgroundArcPaint.setStrokeWidth(arcWidth *0.95f); // *0.95f so there is no antialiasing overlap
         foregroundArcPaint.setStrokeWidth(arcWidth);
     }
 
-    private void setArcSweepAngle(float angle){
-        arcSweepAngle = angle;
+
+    private void setCurrentArcSweepAngleAndInvalidate(float angle){
+        currentArcSweepAngle = angle;
         postInvalidate();
     }
 
 
-    public void setTime(int timeMillisTotal, int timeMillisLeft){
+    private void updateTimer(int timeMillisTotal, int timeMillisLeft){
         if (isAnimationEnabled()) {
-            switch (timerState) {
-                case STARTED:
-                    drawWhenStarted(timeMillisTotal, timeMillisLeft);
-                    break;
-                case PAUSED:
-                case STOPPED:
-                    drawWhenStopped(timeMillisTotal, timeMillisLeft);
-                    break;
-            }
-        } else setArcSweepAngle(getNewSweepAngle(timeMillisTotal, timeMillisLeft));
-        setCurrentTimerString(getTimeString(timeMillisLeft));
+            animateWidget(timeMillisTotal,timeMillisLeft);
+        } else setCurrentArcSweepAngleAndInvalidate(getNewSweepAngle(timeMillisTotal, timeMillisLeft));
+        
+        setDisplayedTime(getTimeString(timeMillisLeft));
 
+    }
+
+
+    private void animateWidget(int timeMillisTotal, int timeMillisLeft){
+        switch (currentTimerState) {
+            case STARTED:
+                drawWhenStarted(timeMillisTotal, timeMillisLeft);
+                break;
+            case PAUSED:
+            case STOPPED:
+                drawWhenStopped(timeMillisTotal, timeMillisLeft);
+                break;
+        }
     }
 
 
@@ -211,14 +195,13 @@ public class TimerView extends View {
     }
 
 
-
     private void drawWhenStarted(int timeMillisTotal, int timeMillisLeft){
         if (!animatingTimer){
             int scaledDrawDurationMillis =(int) (animationDrawDuration / getAnimationDurationScale());
             timeMillisLeft = timeMillisLeft <= 0 ? 0 : timeMillisLeft - scaledDrawDurationMillis;
             float newSweepAngle = getNewSweepAngle(timeMillisTotal, timeMillisLeft);
-            animateDrawArc(scaledDrawDurationMillis, newSweepAngle);
-            animateArc(timeMillisLeft, scaledDrawDurationMillis, newSweepAngle);
+            startDrawingAnimation(scaledDrawDurationMillis, newSweepAngle);
+            startAnimatingTimer(timeMillisLeft, scaledDrawDurationMillis, newSweepAngle);
             animatingTimer = true;
         }
     }
@@ -229,27 +212,27 @@ public class TimerView extends View {
             stopAnimation();
         }
         float newSweepAngle = getNewSweepAngle(timeMillisTotal, timeMillisLeft);
-        animateDrawArc((int) (animationDrawDuration / getAnimationDurationScale()), newSweepAngle);
+        startDrawingAnimation((int) (animationDrawDuration / getAnimationDurationScale()), newSweepAngle);
     }
 
 
     private float getNewSweepAngle(int millisTotal, int millisLeft){
-        anglePercentage = millisLeft > 0 ? (float) millisLeft / (float) millisTotal : 0;
+        float anglePercentage = millisLeft > 0 ? (float) millisLeft / (float) millisTotal : 0;
         return initialArcSweepAngle * anglePercentage;
     }
 
 
-    private void animateDrawArc(int durationMillis, float destinationAngle){
+    private void startDrawingAnimation(int durationMillis, float destinationAngle){
         if (firstDraw) {
-            setArcSweepAngle(destinationAngle);
+            setCurrentArcSweepAngleAndInvalidate(destinationAngle);
             firstDraw = false;
         } else {
-            drawAnimator = ValueAnimator.ofFloat(arcSweepAngle, destinationAngle);
+            drawAnimator = ValueAnimator.ofFloat(currentArcSweepAngle, destinationAngle);
             drawAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator updatedAnimation) {
                     float animatedValue = (float) updatedAnimation.getAnimatedValue();
-                    setArcSweepAngle(animatedValue);
+                    setCurrentArcSweepAngleAndInvalidate(animatedValue);
                 }
             });
             drawAnimator.setInterpolator(new TimeInterpolator() {
@@ -263,14 +246,15 @@ public class TimerView extends View {
         }
     }
 
-    private void animateArc(int durationMillis, int delayMillis, float startingAngle){
+
+    private void startAnimatingTimer(int durationMillis, int delayMillis, float startingAngle){
         // animator that animates timer itself
         timerAnimator = ValueAnimator.ofFloat(startingAngle, 0);
         timerAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator updatedAnimation) {
                 float animatedValue = (float)updatedAnimation.getAnimatedValue();
-                setArcSweepAngle(animatedValue);
+                setCurrentArcSweepAngleAndInvalidate(animatedValue);
             }
         });
         timerAnimator.setInterpolator(new TimeInterpolator() {
@@ -284,6 +268,7 @@ public class TimerView extends View {
         timerAnimator.start();
     }
 
+
     public float getAnimationDurationScale(){
         return Settings.Global.getFloat(
                 getContext().getContentResolver(),
@@ -291,14 +276,14 @@ public class TimerView extends View {
     }
 
 
-
     public void stopAnimation(){
        if (timerAnimator != null) timerAnimator.cancel();
         animatingTimer = false;
     }
 
-    private void setCurrentTimerString(String currentTime){
-        currentTimerString = currentTime;
+
+    private void setDisplayedTime(String currentTime){
+        displayedTime = currentTime;
     }
 
 
@@ -309,26 +294,33 @@ public class TimerView extends View {
     }
 
 
-    public void timerStarted(int millisTotal, int millisLeft){
-        timerState = TimerState.STARTED;
-        setTime(millisTotal, millisLeft);
+    public void onTimerStarted(int millisTotal, int millisLeft){
+        currentTimerState = TimerState.STARTED;
+        updateTimer(millisTotal, millisLeft);
     }
 
 
-    public void timerPaused(int millisTotal, int millisLeft){
-        timerState = TimerState.PAUSED;
-        setTime(millisTotal, millisLeft);
+    public void onTimerPaused(int millisTotal, int millisLeft){
+        currentTimerState = TimerState.PAUSED;
+        updateTimer(millisTotal, millisLeft);
 
     }
 
-    public void timerStopped(int millisTotal, int millisLeft){
-        timerState = TimerState.STOPPED;
-        setTime(millisTotal, millisLeft);
+
+    public void onTimerStopped(int millisTotal, int millisLeft){
+        currentTimerState = TimerState.STOPPED;
+        updateTimer(millisTotal, millisLeft);
 
     }
 
-    public void updateTimer(int millisTotal, int millisLeft){
-        setTime(millisTotal, millisLeft);
+
+    public void onTimerUpdate(int millisTotal, int millisLeft){
+        updateTimer(millisTotal, millisLeft);
+    }
+
+
+    public float getCurrentArcSweepAngle() {
+        return currentArcSweepAngle;
     }
 
 

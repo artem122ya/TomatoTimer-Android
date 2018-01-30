@@ -121,16 +121,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void updateTimerView(TimerState currentTimerState, int millisTotal, int millisLeft){
         switch (currentTimerState){
             case STARTED:
-                timerView.timerStarted(millisTotal, millisLeft);
+                timerView.onTimerStarted(millisTotal, millisLeft);
                 break;
             case PAUSED:
-                timerView.timerPaused(millisTotal, millisLeft);
+                timerView.onTimerPaused(millisTotal, millisLeft);
                 break;
             case STOPPED:
-                timerView.timerStopped(millisTotal, millisLeft);
+                timerView.onTimerStopped(millisTotal, millisLeft);
                 break;
             default:
-                timerView.updateTimer(millisTotal, millisLeft);
+                timerView.onTimerUpdate(millisTotal, millisLeft);
         }
     }
 
