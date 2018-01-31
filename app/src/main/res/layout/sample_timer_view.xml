@@ -1,0 +1,7 @@
+<artem122ya.tomatotimer.views.TimerView
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="300dp"
+    app:background_arc_color="@color/colorPrimary"
+    app:foreground_arc_color="@color/colorAccent" />
