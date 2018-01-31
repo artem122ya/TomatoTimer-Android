@@ -138,14 +138,11 @@ public class TimerService extends Service {
             if (timerState == TimerState.STOPPED) {
                 moveToNextPeriod();
                 checkNumberOfSessionsUntilBreak();
-                timeMillisStarted = System.currentTimeMillis();
-                totalMillis = getTimeLeftMillis(currentPeriod);
-                timeMillisLeft = totalMillis;
-                stopTimeMillis = timeMillisStarted + totalMillis;
+                resetTimeCounter();
 
-                timerThread = new Thread(new TimerRunnable());
                 timerState = TimerState.STARTED;
-                timerThread.start();
+
+                restartThread();
             } else if (timerState == TimerState.PAUSED) {
                 timerState = TimerState.STARTED;
                 timerThreadLock.notifyAll();
@@ -171,6 +168,19 @@ public class TimerService extends Service {
     }
 
 
+    private void resetTimeCounter(){
+        timeMillisStarted = System.currentTimeMillis();
+        totalMillis = getTimeLeftMillis(currentPeriod);
+        timeMillisLeft = totalMillis;
+        stopTimeMillis = timeMillisStarted + totalMillis;
+    }
+
+
+    private void restartThread(){
+        timerThread = new Thread(new TimerRunnable());
+        timerThread.start();
+    }
+
 
 
     public void pauseTimer() {
@@ -190,7 +200,6 @@ public class TimerService extends Service {
                 timerState = TimerState.STOPPED;
                 timerThreadLock.notifyAll();
             }
-
             sendTime(getTimeLeftMillis(getNextPeriod()), getTimeLeftMillis(getNextPeriod()));
         }
     }
@@ -203,7 +212,6 @@ public class TimerService extends Service {
             } else {
                 stopTimer();
             }
-
         }
     }
 
