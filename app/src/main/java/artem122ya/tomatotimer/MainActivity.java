@@ -45,6 +45,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         stopButton.setOnClickListener(this);
         skipButton.setOnClickListener(this);
 
+        this.setTitle("");
+
     }
 
     @Override
