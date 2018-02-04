@@ -89,7 +89,6 @@ public class TimerView extends View {
         foregroundArcPaint.setStrokeCap(Paint.Cap.ROUND);
 
         timerTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        timerTextPaint.setColor(Color.BLACK);
         timerTextPaint.setTypeface(Typeface.createFromAsset(getContext().getAssets(),
                 "fonts/Roboto-Regular.ttf"));
 
@@ -97,8 +96,9 @@ public class TimerView extends View {
 
 
     private void applyAttrs(TypedArray a){
-        foregroundArcPaint.setColor(a.getColor(R.styleable.TimerView_foreground_arc_color, Color.GRAY));
-        backgroundArcPaint.setColor(a.getColor(R.styleable.TimerView_background_arc_color, Color.RED));
+        foregroundArcPaint.setColor(a.getColor(R.styleable.TimerView_colorTimerViewForegroundArc, Color.GRAY));
+        backgroundArcPaint.setColor(a.getColor(R.styleable.TimerView_colorTimerViewBackgroundArc, Color.RED));
+        timerTextPaint.setColor(a.getColor(R.styleable.TimerView_colorTimerViewText, Color.BLACK));
     }
 
 

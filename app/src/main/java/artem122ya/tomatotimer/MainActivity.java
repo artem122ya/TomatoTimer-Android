@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -20,7 +22,8 @@ import artem122ya.tomatotimer.TimerService.TimerState;
 import artem122ya.tomatotimer.settings.SettingsActivity;
 import artem122ya.tomatotimer.views.TimerView;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     private FloatingActionButton startButton;
     private ImageButton stopButton, skipButton;
@@ -31,8 +34,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private TimerState currentTimerState;
 
+    private SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        setDarkTheme(sharedPreferences.getBoolean("dark_mode", false));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -45,15 +52,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         stopButton.setOnClickListener(this);
         skipButton.setOnClickListener(this);
 
+
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
+
         this.setTitle("");
 
     }
+
 
     @Override
     protected void onStart() {
         super.onStart();
         // Bind TimerService.
-        LocalBroadcastManager.getInstance(this).registerReceiver(onEvent , new IntentFilter(TimerService.ACTION_SEND_TIME));
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
+                new IntentFilter(TimerService.ACTION_SEND_TIME));
         Intent intent = new Intent(this, TimerService.class);
         startService(intent);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
@@ -61,12 +74,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unbindService(serviceConnection);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(onEvent);
-    }
 
     @Override
     protected void onRestart() {
@@ -76,6 +83,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         updateButtons(timerService.getCurrentTimerState());
         initializeTimerView();
     }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(serviceConnection);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -106,7 +129,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private BroadcastReceiver onEvent = new BroadcastReceiver() {
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("dark_mode")) {
+            setDarkTheme(sharedPreferences.getBoolean("dark_mode", false));
+            recreate();
+        }
+    }
+
+    private void setDarkTheme(boolean darkThemeEnabled){
+        setTheme(darkThemeEnabled ? R.style.TimerActivityDark : R.style.TimerActivityLight);
+    }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             int timeMillisLeft = intent.getIntExtra(TimerService.INT_TIME_MILLIS_LEFT, 0);
             int timeMillisTotal = intent.getIntExtra(TimerService.INT_TIME_MILLIS_TOTAL, 0);
@@ -151,13 +187,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void onTimerStateChanged(){
         switch (currentTimerState){
             case STARTED:
-                startButton.setImageResource(R.drawable.ic_pause_white_85_opacity);
+                startButton.setImageResource(R.drawable.ic_pause_85_opacity);
                 stopButton.setVisibility(View.VISIBLE);
                 break;
             case STOPPED:
                 stopButton.setVisibility(View.INVISIBLE);
             case PAUSED:
-                startButton.setImageResource(R.drawable.ic_play_white_85_opacity);
+                startButton.setImageResource(R.drawable.ic_play_85_opacity);
                 break;
         }
     }

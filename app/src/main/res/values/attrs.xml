@@ -1,6 +1,9 @@
 <resources>
     <declare-styleable name="TimerView">
-        <attr name="background_arc_color" format="color"/>
-        <attr name="foreground_arc_color" format="color"/>
+        <attr name="colorTimerViewBackgroundArc" format="color"/>
+        <attr name="colorTimerViewForegroundArc" format="color"/>
+        <attr name="colorTimerViewText" format="color"/>
+        <attr name="colorStopSkipButton" format="color"/>
+        <attr name="colorStartPauseButton" format="color"/>
     </declare-styleable>
 </resources>

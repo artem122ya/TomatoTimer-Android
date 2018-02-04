@@ -1,0 +1,11 @@
+<resources>
+    <style name="TimerActivityLight" parent="TransparentActionBarLight">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="colorPrimaryDark">@android:color/transparent</item>
+    </style>
+
+    <style name="TimerActivityDark" parent="TransparentActionBarDark">
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+</resources>
