@@ -1,14 +1,19 @@
 package artem122ya.tomatotimer.settings;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.drawable.ColorDrawable;
 import android.preference.DialogPreference;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.NumberPicker;
+
+import artem122ya.tomatotimer.R;
 
 public class NumberPickerDialogPreference extends DialogPreference {
 
@@ -46,6 +51,7 @@ public class NumberPickerDialogPreference extends DialogPreference {
 
         picker = new NumberPicker(getContext());
         picker.setLayoutParams(layoutParams);
+        setDividerColor(picker, ContextCompat.getColor(getContext(), R.color.colorPrimary));
 
         FrameLayout dialogView = new FrameLayout(getContext());
         dialogView.addView(picker);
@@ -90,5 +96,27 @@ public class NumberPickerDialogPreference extends DialogPreference {
 
     public int getValue() {
         return this.value;
+    }
+
+    private void setDividerColor(NumberPicker picker, int color) {
+
+        java.lang.reflect.Field[] pickerFields = NumberPicker.class.getDeclaredFields();
+        for (java.lang.reflect.Field pf : pickerFields) {
+            if (pf.getName().equals("mSelectionDivider")) {
+                pf.setAccessible(true);
+                try {
+                    ColorDrawable colorDrawable = new ColorDrawable(color);
+                    pf.set(picker, colorDrawable);
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                } catch (Resources.NotFoundException e) {
+                    e.printStackTrace();
+                }
+                catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
     }
 }
