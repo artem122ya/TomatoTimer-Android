@@ -30,4 +30,6 @@
     <string name="small_break_time_minutes_default_value">5</string>
     <string name="big_break_time_minutes_default_value">15</string>
     <string name="sessions_until_big_break_default_value">4</string>
+    <string name="number_picker_dialog_positive_button_text">Ok</string>
+    <string name="number_picker_dialog_negative_button_text">Cancel</string>
 </resources>

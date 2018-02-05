@@ -41,6 +41,8 @@ public class NumberPickerDialogPreference extends DialogPreference {
     private void init(AttributeSet attrs){
         minValue = attrs.getAttributeIntValue(attributeNamespace, "min_value", 0);
         maxValue = attrs.getAttributeIntValue(attributeNamespace, "max_value", 100);
+        setPositiveButtonText(R.string.number_picker_dialog_positive_button_text);
+        setNegativeButtonText(R.string.number_picker_dialog_negative_button_text);
     }
 
     @Override
@@ -51,7 +53,7 @@ public class NumberPickerDialogPreference extends DialogPreference {
 
         picker = new NumberPicker(getContext());
         picker.setLayoutParams(layoutParams);
-        setDividerColor(picker, ContextCompat.getColor(getContext(), R.color.colorPrimary));
+        setDividerColor(picker, ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
 
         FrameLayout dialogView = new FrameLayout(getContext());
         dialogView.addView(picker);
