@@ -24,7 +24,8 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        setDarkTheme(sharedPreferences.getBoolean("dark_mode", false));
+        setDarkTheme(sharedPreferences.getBoolean(getString(R.string.dark_mode_preference_key)
+                , false));
         super.onCreate(savedInstanceState);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -42,7 +43,7 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("dark_mode")) {
+        if (key.equals(getString(R.string.dark_mode_preference_key))) {
             startActivity(new Intent(this, SettingsActivity.class));
             finish();
         }

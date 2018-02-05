@@ -163,7 +163,7 @@ public class TimerService extends Service {
 
     private void checkNumberOfSessionsUntilBreak(){
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        periodsUntilBreak = sharedPrefs.getInt("sessions_until_big_break",
+        periodsUntilBreak = sharedPrefs.getInt(getString(R.string.sessions_until_big_break_preference_key),
                 Integer.valueOf(getString(R.string.sessions_until_big_break_default_value)));
     }
 
@@ -253,15 +253,15 @@ public class TimerService extends Service {
         switch (period){
             case NOT_INITIALIZED:
             case FOCUS:
-                timeLeft = sharedPrefs.getInt("focus_time_minutes",
+                timeLeft = sharedPrefs.getInt(getString(R.string.focus_time_minutes_preference_key),
                         Integer.valueOf(getString(R.string.focus_time_minutes_default_value)) );
                 break;
             case BREAK:
-                timeLeft = sharedPrefs.getInt("small_break_time_minutes",
+                timeLeft = sharedPrefs.getInt(getString(R.string.small_break_time_minutes_preference_key),
                         Integer.valueOf(getString(R.string.small_break_time_minutes_default_value)));
                 break;
             case BIG_BREAK:
-                timeLeft = sharedPrefs.getInt("big_break_period_minutes",
+                timeLeft = sharedPrefs.getInt(getString(R.string.big_break_time_minutes_preference_key),
                         Integer.valueOf(getString(R.string.big_break_time_minutes_default_value)));
                 break;
         }

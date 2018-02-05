@@ -39,7 +39,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        setDarkTheme(sharedPreferences.getBoolean("dark_mode", false));
+        setDarkTheme(sharedPreferences.getBoolean(getString(R.string.dark_mode_preference_key),
+                false));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -132,8 +133,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("dark_mode")) {
-            setDarkTheme(sharedPreferences.getBoolean("dark_mode", false));
+        if (key.equals(getString(R.string.dark_mode_preference_key))) {
+            setDarkTheme(sharedPreferences.getBoolean(getString(R.string.dark_mode_preference_key)
+                    , false));
             recreate();
         }
     }
