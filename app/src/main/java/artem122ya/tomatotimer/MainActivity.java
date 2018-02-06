@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PeriodState currentTimerPeriod;
 
     private TextView currentPeriodTextView, periodsUntilBigBreakTextView;
+    private short periodsUntilBigBreak;
 
     private SharedPreferences sharedPreferences;
 
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         updateButtons(timerService.getCurrentTimerState());
         initializeTimerView();
         showCurrentStateText();
+        setPeriodCounter();
     }
 
 
@@ -170,6 +172,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void setPeriodCounter(){
+        short newPeriodCount = timerService.getPeriodsLeftUntilBigBreak();
+        if (periodsUntilBigBreak != newPeriodCount){
+            periodsUntilBigBreakTextView.setText(String.valueOf(newPeriodCount));
+            periodsUntilBigBreak = newPeriodCount;
+        }
+    }
+
     private void setDarkTheme(boolean darkThemeEnabled){
         setTheme(darkThemeEnabled ? R.style.TimerActivityDark : R.style.TimerActivityLight);
     }
@@ -179,6 +189,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             int timeMillisLeft = intent.getIntExtra(TimerService.INT_TIME_MILLIS_LEFT, 0);
             int timeMillisTotal = intent.getIntExtra(TimerService.INT_TIME_MILLIS_TOTAL, 0);
             TimerState timerState = (TimerState) intent.getSerializableExtra(TimerService.ENUM_TIMER_STATE);
+
+            setPeriodCounter();
 
             showCurrentStateText();
 
@@ -225,7 +237,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 stopButton.setVisibility(View.VISIBLE);
                 break;
             case STOPPED:
-                stopButton.setVisibility(View.INVISIBLE);
+//                if (timerService.getConsecutiveFocusPeriods() < 1)
+                    stopButton.setVisibility(View.INVISIBLE);
             case PAUSED:
                 startButton.setImageResource(R.drawable.ic_play_85_opacity);
                 break;
@@ -240,6 +253,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             updateButtons(timerService.getCurrentTimerState());
             initializeTimerView();
             showCurrentStateText();
+            setPeriodCounter();
         }
 
         @Override

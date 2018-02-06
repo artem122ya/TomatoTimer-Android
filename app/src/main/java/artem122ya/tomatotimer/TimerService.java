@@ -42,7 +42,7 @@ public class TimerService extends Service {
 
     public enum PeriodState {FOCUS, BREAK, BIG_BREAK}
     private volatile PeriodState currentPeriod = PeriodState.FOCUS;
-    public int consecutiveFocusPeriod = 0;
+    private int consecutiveFocusPeriods = 0;
     private int periodsUntilBreak = 3;
 
     private volatile int timeMillisLeft = 0;
@@ -151,9 +151,9 @@ public class TimerService extends Service {
 
     private void moveToNextPeriod(){
         if (currentPeriod == PeriodState.FOCUS){
-            consecutiveFocusPeriod++;
+            consecutiveFocusPeriods++;
         } else if (currentPeriod == PeriodState.BIG_BREAK){
-            consecutiveFocusPeriod = 0;
+            consecutiveFocusPeriods = 0;
         }
         currentPeriod = getNextPeriod();
     }
@@ -218,7 +218,7 @@ public class TimerService extends Service {
 
     public void onStopButtonClick(){
         currentPeriod = PeriodState.BREAK;
-        consecutiveFocusPeriod = 0;
+        consecutiveFocusPeriods = 0;
         stopTimer();
         stopForeground(true);
     }
@@ -237,7 +237,7 @@ public class TimerService extends Service {
     public PeriodState getNextPeriod(){
         switch (currentPeriod){
             case FOCUS:
-                if (periodsUntilBreak != 0 && consecutiveFocusPeriod >= periodsUntilBreak) return PeriodState.BIG_BREAK;
+                if (periodsUntilBreak != 0 && consecutiveFocusPeriods >= periodsUntilBreak) return PeriodState.BIG_BREAK;
                 else return PeriodState.BREAK;
             case BREAK:
             case BIG_BREAK:
@@ -294,6 +294,10 @@ public class TimerService extends Service {
 
     public TimerState getCurrentTimerState(){
         return timerState;
+    }
+
+    public short getPeriodsLeftUntilBigBreak(){
+        return (short) (periodsUntilBreak - consecutiveFocusPeriods);
     }
 
 
@@ -384,6 +388,13 @@ public class TimerService extends Service {
     public PeriodState getCurrentPeriod() {
         return currentPeriod;
     }
+
+
+    public int getConsecutiveFocusPeriods() {
+        return consecutiveFocusPeriods;
+    }
+
+
 
 
 
