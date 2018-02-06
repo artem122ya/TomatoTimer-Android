@@ -17,7 +17,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
+import artem122ya.tomatotimer.TimerService.PeriodState;
 import artem122ya.tomatotimer.TimerService.TimerState;
 import artem122ya.tomatotimer.settings.SettingsActivity;
 import artem122ya.tomatotimer.views.TimerView;
@@ -33,6 +35,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TimerView timerView;
 
     private TimerState currentTimerState;
+    private PeriodState currentTimerPeriod;
+
+    private TextView currentPeriodTextView, periodsUntilBigBreakTextView;
 
     private SharedPreferences sharedPreferences;
 
@@ -48,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         stopButton = findViewById(R.id.stopButton);
         skipButton = findViewById(R.id.skipButton);
         timerView = findViewById(R.id.timerView);
+        currentPeriodTextView = findViewById(R.id.currentPeriodTextView);
+        periodsUntilBigBreakTextView = findViewById(R.id.periodsUntilBigBreakTextView);
+
 
         startButton.setOnClickListener(this);
         stopButton.setOnClickListener(this);
@@ -83,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         timerView.stopAnimation();
         updateButtons(timerService.getCurrentTimerState());
         initializeTimerView();
+        showCurrentStateText();
     }
 
 
@@ -121,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
+        showCurrentStateText();
         if (view == startButton){
             timerService.onStartPauseButtonClick();
         } else if (view == stopButton) {
@@ -140,6 +150,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void showCurrentStateText(){
+        PeriodState newPeriod = timerService.getCurrentPeriod();
+        if (currentTimerPeriod != newPeriod) {
+            currentTimerPeriod = newPeriod;
+            String currentSession = "";
+            switch (currentTimerPeriod) {
+                case FOCUS:
+                    currentSession = getString(R.string.work_time_text);
+                    break;
+                case BREAK:
+                    currentSession = getString(R.string.break_time_text);
+                    break;
+                case BIG_BREAK:
+                    currentSession = getString(R.string.big_break_text);
+                    break;
+            }
+            currentPeriodTextView.setText(currentSession);
+        }
+    }
+
     private void setDarkTheme(boolean darkThemeEnabled){
         setTheme(darkThemeEnabled ? R.style.TimerActivityDark : R.style.TimerActivityLight);
     }
@@ -149,6 +179,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             int timeMillisLeft = intent.getIntExtra(TimerService.INT_TIME_MILLIS_LEFT, 0);
             int timeMillisTotal = intent.getIntExtra(TimerService.INT_TIME_MILLIS_TOTAL, 0);
             TimerState timerState = (TimerState) intent.getSerializableExtra(TimerService.ENUM_TIMER_STATE);
+
+            showCurrentStateText();
 
             updateButtons(timerState);
 
@@ -207,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             timerService = ((TimerService.LocalBinder) iBinder).getService();
             updateButtons(timerService.getCurrentTimerState());
             initializeTimerView();
+            showCurrentStateText();
         }
 
         @Override

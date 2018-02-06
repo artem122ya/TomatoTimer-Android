@@ -47,8 +47,9 @@ public class TimerServiceTest {
 
 
     @Test
-    public void startTimer_shouldIncrementConsecutiveFocusPeriod_whenCalled(){
+    public void stopTimer_shouldIncrementConsecutiveFocusPeriod_whenCalled(){
         timerService.startTimer();
+        timerService.stopTimer();
         assertEquals(1, timerService.consecutiveFocusPeriod);
     }
 
@@ -64,7 +65,7 @@ public class TimerServiceTest {
     @Test
     public void onSkipButtonClick_shouldSkipToNextPeriod_whenCalled(){
         timerService.onSkipButtonClickInActivity();
-        assertEquals(TimerService.PeriodState.FOCUS, timerService.currentPeriod);
+        assertEquals(TimerService.PeriodState.BREAK, timerService.getCurrentPeriod());
     }
 
     @Test

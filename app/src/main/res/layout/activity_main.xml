@@ -13,6 +13,14 @@
         android:layout_columnSpan="3"
         android:layout_row="0"/>
 
+    <TextView
+        android:id="@+id/currentPeriodTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_column="1"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_row="1" />
+
     <ImageButton
         android:id="@+id/stopButton"
         android:layout_width="50dp"
@@ -20,7 +28,7 @@
         android:layout_column="0"
         android:layout_columnWeight="5"
         android:layout_gravity="center"
-        android:layout_row="1"
+        android:layout_row="2"
         android:background="?android:selectableItemBackground"
         android:scaleType="fitXY"
         app:srcCompat="@drawable/ic_stop_85_opacity"
@@ -33,7 +41,7 @@
         android:layout_column="1"
         android:layout_columnWeight="0"
         android:layout_gravity="center"
-        android:layout_row="1"
+        android:layout_row="2"
         android:layout_rowSpan="1"
         android:clickable="true"
         app:borderWidth="0dp"
@@ -49,9 +57,20 @@
         android:layout_column="2"
         android:layout_columnWeight="5"
         android:layout_gravity="center"
-        android:layout_row="1"
+        android:layout_row="2"
+        android:layout_rowWeight="1"
         android:background="?android:selectableItemBackground"
         android:scaleType="fitXY"
         app:srcCompat="@drawable/ic_skip_next_85_opacity"
         android:contentDescription="@string/skip_button_content_description"/>
+
+    <TextView
+        android:id="@+id/periodsUntilBigBreakTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_column="1"
+        android:layout_gravity="center_horizontal|center"
+        android:layout_row="3"
+        android:layout_rowWeight="1"
+        android:text="2 work periods until big break." />
 </GridLayout>
