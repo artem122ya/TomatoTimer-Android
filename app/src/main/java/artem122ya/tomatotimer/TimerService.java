@@ -15,7 +15,7 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import java.util.concurrent.TimeUnit;
 
-public class TimerService extends Service {
+public class TimerService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static String ACTION_SEND_TIME = "artem122ya.tomatotimer.time_send";
     public static String INT_TIME_MILLIS_LEFT = "artem122ya.tomatotimer.time_extra_millis_left";
@@ -59,6 +59,7 @@ public class TimerService extends Service {
     private PendingIntent startActionIntent, stopActionIntent, pauseActionIntent,
             openMainActivityIntent, skipActionIntent;
 
+    SharedPreferences sharedPreferences;
 
 
     public class LocalBinder extends Binder {
@@ -79,14 +80,23 @@ public class TimerService extends Service {
         return super.onUnbind(intent);
     }
 
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        createIntentFilter();
+        initControlIntents();
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        checkNumberOfSessionsUntilBreak(sharedPreferences);
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         thisTimerService = this;
-
-        createIntentFilter();
-        initControlIntents();
-        checkNumberOfSessionsUntilBreak();
 
         return START_NOT_STICKY;
     }
@@ -123,6 +133,7 @@ public class TimerService extends Service {
     @Override
     public void onDestroy() {
         stopTimer();
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
         try {
             unregisterReceiver(actionReceiver);
         } catch (IllegalArgumentException e){
@@ -159,10 +170,10 @@ public class TimerService extends Service {
     }
 
 
-    private void checkNumberOfSessionsUntilBreak(){
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+    private void checkNumberOfSessionsUntilBreak(SharedPreferences sharedPrefs){
         periodsUntilBreak = sharedPrefs.getInt(getString(R.string.sessions_until_big_break_preference_key),
                 Integer.valueOf(getString(R.string.sessions_until_big_break_default_value)));
+        if (consecutiveFocusPeriods > periodsUntilBreak) consecutiveFocusPeriods = periodsUntilBreak;
     }
 
 
@@ -195,7 +206,6 @@ public class TimerService extends Service {
 
         if (timerState != TimerState.STOPPED) {
             synchronized (timerThreadLock) {
-                checkNumberOfSessionsUntilBreak();
                 moveToNextPeriod();
                 timerState = TimerState.STOPPED;
                 timerThreadLock.notifyAll();
@@ -297,7 +307,8 @@ public class TimerService extends Service {
     }
 
     public short getPeriodsLeftUntilBigBreak(){
-        return (short) (periodsUntilBreak - consecutiveFocusPeriods);
+        if (periodsUntilBreak - consecutiveFocusPeriods <= 0) return (short) periodsUntilBreak;
+        else return (short) (periodsUntilBreak - consecutiveFocusPeriods);
     }
 
 
@@ -395,9 +406,10 @@ public class TimerService extends Service {
     }
 
 
-
-
-
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        checkNumberOfSessionsUntilBreak(sharedPreferences);
+    }
 
     private class TimerRunnable implements Runnable {
         @Override

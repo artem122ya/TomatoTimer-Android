@@ -174,9 +174,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setPeriodCounter(){
         short newPeriodCount = timerService.getPeriodsLeftUntilBigBreak();
-        if (periodsUntilBigBreak != newPeriodCount){
-            periodsUntilBigBreakTextView.setText(String.valueOf(newPeriodCount));
-            periodsUntilBigBreak = newPeriodCount;
+        if (newPeriodCount == 0){
+            periodsUntilBigBreakTextView.setText("");
+        } else if (newPeriodCount == 1){
+            periodsUntilBigBreakTextView.setText(R.string.one_session_until_big_break_text);
+        } else {
+            periodsUntilBigBreakTextView.setText(newPeriodCount + getString(R.string.sessions_until_big_break_text));
         }
     }
 

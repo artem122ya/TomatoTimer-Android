@@ -40,4 +40,7 @@
     <string name="big_break_time_minutes_preference_key">big_break_time_minutes</string>
     <string name="sessions_until_big_break_preference_key">sessions_until_big_break</string>
     <string name="dark_mode_preference_key">dark_mode</string>
+
+    <string name="one_session_until_big_break_text">Big break coming up next!</string>
+    <string name="sessions_until_big_break_text">" work sessions left until big break"</string>
 </resources>
