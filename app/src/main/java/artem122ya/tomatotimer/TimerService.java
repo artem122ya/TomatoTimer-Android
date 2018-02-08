@@ -410,8 +410,8 @@ public class TimerService extends Service {
                     sendTime(totalMillis, timeMillisLeft);
                     timerRunningNotification();
                     if(timeMillisLeft <= 0){
-                        stopTimer();
                         timerFinishedNotification();
+                        stopTimer();
                     }
 
                     try {
