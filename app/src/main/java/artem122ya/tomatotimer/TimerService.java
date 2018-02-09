@@ -166,7 +166,7 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
         } else if (currentPeriod == PeriodState.BIG_BREAK){
             consecutiveFocusPeriods = 0;
         }
-        currentPeriod = getNextPeriod();
+        currentPeriod = getNextPeriod(consecutiveFocusPeriods);
     }
 
 
@@ -244,7 +244,7 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
     }
 
 
-    public PeriodState getNextPeriod(){
+    public PeriodState getNextPeriod(int consecutiveFocusPeriods){
         switch (currentPeriod){
             case FOCUS:
                 if (periodsUntilBreak != 0 && consecutiveFocusPeriods >= periodsUntilBreak) return PeriodState.BIG_BREAK;
@@ -361,7 +361,8 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
                         .setSmallIcon(R.mipmap.ic_notification_icon)
                         .setColor(getResources().getColor(R.color.colorPrimary))
                         .setContentTitle(getSessionName(currentPeriod) + getString(R.string.finished_notification_title))
-                        .setContentText(getString(R.string.finished_notification_text) + getSessionName(getNextPeriod()) + "?")
+                        .setContentText(getString(R.string.finished_notification_text)
+                                + getSessionName(getNextPeriod(consecutiveFocusPeriods + 1)) + "?")
                         .setContentIntent(openMainActivityIntent)
                         .addAction(new Notification.Action(R.drawable.ic_play_arrow_black_24dp,
                                 getString(R.string.start_notification_action_title), startActionIntent))
