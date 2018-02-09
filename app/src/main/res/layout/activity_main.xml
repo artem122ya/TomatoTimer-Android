@@ -71,6 +71,5 @@
         android:layout_column="1"
         android:layout_gravity="center_horizontal|center"
         android:layout_row="3"
-        android:layout_rowWeight="1"
-        android:text="2 work periods until big break." />
+        android:layout_rowWeight="1"/>
 </GridLayout>
