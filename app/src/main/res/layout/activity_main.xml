@@ -17,9 +17,10 @@
         android:id="@+id/currentPeriodTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_column="1"
+        android:layout_column="0"
         android:layout_gravity="top|center_horizontal"
-        android:layout_row="1" />
+        android:layout_row="1"
+        android:layout_columnSpan="3"/>
 
     <ImageButton
         android:id="@+id/stopButton"
@@ -58,7 +59,7 @@
         android:layout_columnWeight="5"
         android:layout_gravity="center"
         android:layout_row="2"
-        android:layout_rowWeight="1"
+        android:layout_rowWeight="5"
         android:background="?android:selectableItemBackground"
         android:scaleType="fitXY"
         app:srcCompat="@drawable/ic_skip_next_85_opacity"
@@ -68,8 +69,9 @@
         android:id="@+id/periodsUntilBigBreakTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_column="1"
-        android:layout_gravity="center_horizontal|center"
+        android:layout_column="0"
+        android:layout_columnSpan="3"
+        android:layout_gravity="center"
         android:layout_row="3"
         android:layout_rowWeight="1"/>
 </GridLayout>

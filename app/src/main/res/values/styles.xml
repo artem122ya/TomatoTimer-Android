@@ -35,6 +35,7 @@
         <item name="colorPrimary">@android:color/transparent</item>
         <item name="colorPrimaryDark">@color/colorGray</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBarOverlay">true</item>
 
         <item name="colorTimerViewBackgroundArc">@color/colorGray</item>
         <item name="colorTimerViewForegroundArc">@color/colorAccent</item>
@@ -48,6 +49,7 @@
         <item name="colorPrimary">@android:color/transparent</item>
         <item name="colorPrimaryDark">@android:color/transparent</item>
         <item name="colorAccent">@color/colorPrimaryDark</item>
+        <item name="windowActionBarOverlay">true</item>
 
         <item name="android:navigationBarColor">@android:color/transparent</item>
 
