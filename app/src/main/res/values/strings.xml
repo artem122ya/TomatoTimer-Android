@@ -3,14 +3,14 @@
     <string name="menu_option_settings">Settings</string>
     <string name="menu_option_about">About</string>
     <string name="settings_label">Settings</string>
-    <string name="focus_minute_picker_title">Work session duration</string>
+    <string name="work_minute_picker_title">Work session duration</string>
     <string name="small_break_minute_picker_title">Small break duration</string>
     <string name="big_break_minute_picker_title">Big break duration</string>
     <string name="timer_preference_category_title">Timer</string>
-    <string name="focus_minute_picker_summary">00 minutes</string>
+    <string name="work_minute_picker_summary">00 minutes</string>
     <string name="small_break_minute_picker_summary">00 minutes</string>
     <string name="big_break_minute_picker_summary">00 minutes</string>
-    <string name="sessions_until_big_break_title">Focus sessions until big break</string>
+    <string name="sessions_until_big_break_title">Work sessions until big break</string>
     <string name="sessions_until_big_break_summary">00 sessions</string>
     <string name="stop_button_content_description">Stop button.</string>
     <string name="start_and_pause_button_content_description">Start or pause button.</string>
@@ -26,7 +26,7 @@
     <string name="big_break_text">Big break</string>
     <string name="finished_notification_title">" finished"</string>
     <string name="finished_notification_text">"Want to start a "</string>
-    <string name="focus_time_minutes_default_value">25</string>
+    <string name="work_time_minutes_default_value">25</string>
     <string name="small_break_time_minutes_default_value">5</string>
     <string name="big_break_time_minutes_default_value">15</string>
     <string name="sessions_until_big_break_default_value">4</string>
@@ -35,7 +35,7 @@
     <string name="theme_preference_category_title">Theme</string>
     <string name="dark_mode_title">Enable night mode</string>
 
-    <string name="focus_time_minutes_preference_key">focus_time_minutes</string>
+    <string name="work_time_minutes_preference_key">work_time_minutes</string>
     <string name="small_break_time_minutes_preference_key">small_break_time_minutes</string>
     <string name="big_break_time_minutes_preference_key">big_break_time_minutes</string>
     <string name="sessions_until_big_break_preference_key">sessions_until_big_break</string>
