@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Redraw timerView in case any settings changed
         super.onRestart();
         timerView.stopAnimation();
-        updateButtons(timerService.getCurrentTimerState(), timerService.getConsecutiveFocusPeriods());
+        updateButtons(timerService.getCurrentTimerState(), timerService.getConsecutiveWorkPeriods());
         initializeTimerView();
         showCurrentStateText();
         setPeriodCounter();
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             showCurrentStateText();
 
-            updateButtons(timerState, timerService.getConsecutiveFocusPeriods());
+            updateButtons(timerState, timerService.getConsecutiveWorkPeriods());
 
             updateTimerView(timerState, timeMillisTotal, timeMillisLeft);
 
@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             timerService = ((TimerService.LocalBinder) iBinder).getService();
-            updateButtons(timerService.getCurrentTimerState(), timerService.getConsecutiveFocusPeriods());
+            updateButtons(timerService.getCurrentTimerState(), timerService.getConsecutiveWorkPeriods());
             initializeTimerView();
             showCurrentStateText();
             setPeriodCounter();

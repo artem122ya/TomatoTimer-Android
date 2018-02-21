@@ -4,10 +4,10 @@
 
     <PreferenceCategory android:title="@string/timer_preference_category_title" >
         <artem122ya.tomatotimer.settings.NumberPickerDialogPreference
-            android:key="@string/focus_time_minutes_preference_key"
-            android:title="@string/focus_minute_picker_title"
-            android:defaultValue="@string/focus_time_minutes_default_value"
-            android:summary="@string/focus_minute_picker_summary"
+            android:key="@string/work_time_minutes_preference_key"
+            android:title="@string/work_minute_picker_title"
+            android:defaultValue="@string/work_time_minutes_default_value"
+            android:summary="@string/work_minute_picker_summary"
             custom:min_value="1"
             custom:max_value="120"/>
 

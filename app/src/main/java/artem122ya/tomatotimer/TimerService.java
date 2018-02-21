@@ -32,7 +32,7 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
 
     int timerNotificationId = 135001;
 
-    private FocusTimerActionReceiver actionReceiver = new FocusTimerActionReceiver();
+    private WorkTimerActionReceiver actionReceiver = new WorkTimerActionReceiver();
 
     private final IBinder iBinder = new LocalBinder();
 
@@ -42,7 +42,7 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
 
     public enum PeriodState {WORK, BREAK, BIG_BREAK}
     private volatile PeriodState currentPeriod = PeriodState.WORK;
-    private int consecutiveFocusPeriods = 0;
+    private int consecutiveWorkPeriods = 0;
     private int periodsUntilBreak = 3;
 
     private volatile int timeMillisLeft = 0;
@@ -162,18 +162,18 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
 
     private void moveToNextPeriod(){
         if (currentPeriod == PeriodState.WORK){
-            consecutiveFocusPeriods++;
+            consecutiveWorkPeriods++;
         } else if (currentPeriod == PeriodState.BIG_BREAK){
-            consecutiveFocusPeriods = 0;
+            consecutiveWorkPeriods = 0;
         }
-        currentPeriod = getNextPeriod(consecutiveFocusPeriods);
+        currentPeriod = getNextPeriod(consecutiveWorkPeriods);
     }
 
 
     private void checkNumberOfSessionsUntilBreak(SharedPreferences sharedPrefs){
         periodsUntilBreak = sharedPrefs.getInt(getString(R.string.sessions_until_big_break_preference_key),
                 Integer.valueOf(getString(R.string.sessions_until_big_break_default_value)));
-        if (consecutiveFocusPeriods > periodsUntilBreak) consecutiveFocusPeriods = periodsUntilBreak;
+        if (consecutiveWorkPeriods > periodsUntilBreak) consecutiveWorkPeriods = periodsUntilBreak;
     }
 
 
@@ -228,7 +228,7 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
 
     public void onStopButtonClick(){
         currentPeriod = PeriodState.BREAK;
-        consecutiveFocusPeriods = 0;
+        consecutiveWorkPeriods = 0;
         stopTimer();
         stopForeground(true);
     }
@@ -244,10 +244,10 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
     }
 
 
-    public PeriodState getNextPeriod(int consecutiveFocusPeriods){
+    public PeriodState getNextPeriod(int consecutiveWorkPeriods){
         switch (currentPeriod){
             case WORK:
-                if (periodsUntilBreak != 0 && consecutiveFocusPeriods >= periodsUntilBreak) return PeriodState.BIG_BREAK;
+                if (periodsUntilBreak != 0 && consecutiveWorkPeriods >= periodsUntilBreak) return PeriodState.BIG_BREAK;
                 else return PeriodState.BREAK;
             case BREAK:
             case BIG_BREAK:
@@ -261,8 +261,8 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
         int timeLeft = 0;
         switch (period){
             case WORK:
-                timeLeft = sharedPrefs.getInt(getString(R.string.focus_time_minutes_preference_key),
-                        Integer.valueOf(getString(R.string.focus_time_minutes_default_value)) );
+                timeLeft = sharedPrefs.getInt(getString(R.string.work_time_minutes_preference_key),
+                        Integer.valueOf(getString(R.string.work_time_minutes_default_value)) );
                 break;
             case BREAK:
                 timeLeft = sharedPrefs.getInt(getString(R.string.small_break_time_minutes_preference_key),
@@ -307,8 +307,8 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
     }
 
     public short getPeriodsLeftUntilBigBreak(){
-        if (periodsUntilBreak - consecutiveFocusPeriods <= 0) return (short) periodsUntilBreak;
-        else return (short) (periodsUntilBreak - consecutiveFocusPeriods);
+        if (periodsUntilBreak - consecutiveWorkPeriods <= 0) return (short) periodsUntilBreak;
+        else return (short) (periodsUntilBreak - consecutiveWorkPeriods);
     }
 
 
@@ -362,7 +362,7 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
                         .setColor(getResources().getColor(R.color.colorPrimary))
                         .setContentTitle(getSessionName(currentPeriod) + getString(R.string.finished_notification_title))
                         .setContentText(getString(R.string.finished_notification_text)
-                                + getSessionName(getNextPeriod(consecutiveFocusPeriods + 1)) + "?")
+                                + getSessionName(getNextPeriod(consecutiveWorkPeriods + 1)) + "?")
                         .setContentIntent(openMainActivityIntent)
                         .addAction(new Notification.Action(R.drawable.ic_play_arrow_black_24dp,
                                 getString(R.string.start_notification_action_title), startActionIntent))
@@ -402,8 +402,8 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
     }
 
 
-    public int getConsecutiveFocusPeriods() {
-        return consecutiveFocusPeriods;
+    public int getConsecutiveWorkPeriods() {
+        return consecutiveWorkPeriods;
     }
 
 
@@ -447,7 +447,7 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
     }
 
 
-    public static class FocusTimerActionReceiver extends BroadcastReceiver {
+    public static class WorkTimerActionReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
