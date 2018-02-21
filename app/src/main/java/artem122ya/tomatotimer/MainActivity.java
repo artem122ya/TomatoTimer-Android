@@ -36,9 +36,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private TimerState currentTimerState;
     private PeriodState currentTimerPeriod;
+    private int consecutivePeriods;
 
     private TextView currentPeriodTextView, periodsUntilBigBreakTextView;
-    private short periodsUntilBigBreak;
 
     private SharedPreferences sharedPreferences;
 
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Redraw timerView in case any settings changed
         super.onRestart();
         timerView.stopAnimation();
-        updateButtons(timerService.getCurrentTimerState());
+        updateButtons(timerService.getCurrentTimerState(), timerService.getConsecutiveFocusPeriods());
         initializeTimerView();
         showCurrentStateText();
         setPeriodCounter();
@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (view == startButton){
             timerService.onStartPauseButtonClick();
         } else if (view == stopButton) {
+            timerService.startTimer();
             timerService.onStopButtonClick();
         } else if (view == skipButton) {
             timerService.onSkipButtonClickInActivity();
@@ -197,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             showCurrentStateText();
 
-            updateButtons(timerState);
+            updateButtons(timerState, timerService.getConsecutiveFocusPeriods());
 
             updateTimerView(timerState, timeMillisTotal, timeMillisLeft);
 
@@ -226,22 +227,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         updateTimerView(timerService.getCurrentTimerState(), timerService.getMillisTotal(), timerService.getMillisLeft());
     }
 
-    public void updateButtons(TimerState timerState){
-        if (currentTimerState != timerState){
+    public void updateButtons(TimerState timerState, int currentConsecutivePeriods){
+        if (currentTimerState != timerState || consecutivePeriods != currentConsecutivePeriods){
+            setButtonsState(timerState, currentConsecutivePeriods);
             currentTimerState = timerState;
-            onTimerStateChanged();
+            consecutivePeriods = currentConsecutivePeriods;
         }
     }
 
-    private void onTimerStateChanged(){
-        switch (currentTimerState){
+    private void setButtonsState(TimerState timerState, int consecutivePeriods){
+        switch (timerState){
             case STARTED:
                 startButton.setImageResource(R.drawable.ic_pause_85_opacity);
                 stopButton.setVisibility(View.VISIBLE);
                 break;
             case STOPPED:
-//                if (timerService.getConsecutiveFocusPeriods() < 1)
+                if (consecutivePeriods < 1)
                     stopButton.setVisibility(View.INVISIBLE);
+                else  stopButton.setVisibility(View.VISIBLE);
             case PAUSED:
                 startButton.setImageResource(R.drawable.ic_play_85_opacity);
                 break;
@@ -253,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             timerService = ((TimerService.LocalBinder) iBinder).getService();
-            updateButtons(timerService.getCurrentTimerState());
+            updateButtons(timerService.getCurrentTimerState(), timerService.getConsecutiveFocusPeriods());
             initializeTimerView();
             showCurrentStateText();
             setPeriodCounter();
