@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             currentTimerPeriod = newPeriod;
             String currentSession = "";
             switch (currentTimerPeriod) {
-                case FOCUS:
+                case WORK:
                     currentSession = getString(R.string.work_time_text);
                     break;
                 case BREAK:

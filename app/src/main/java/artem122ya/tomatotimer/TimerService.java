@@ -40,8 +40,8 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
 
 
 
-    public enum PeriodState {FOCUS, BREAK, BIG_BREAK}
-    private volatile PeriodState currentPeriod = PeriodState.FOCUS;
+    public enum PeriodState {WORK, BREAK, BIG_BREAK}
+    private volatile PeriodState currentPeriod = PeriodState.WORK;
     private int consecutiveFocusPeriods = 0;
     private int periodsUntilBreak = 3;
 
@@ -161,7 +161,7 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
 
 
     private void moveToNextPeriod(){
-        if (currentPeriod == PeriodState.FOCUS){
+        if (currentPeriod == PeriodState.WORK){
             consecutiveFocusPeriods++;
         } else if (currentPeriod == PeriodState.BIG_BREAK){
             consecutiveFocusPeriods = 0;
@@ -246,21 +246,21 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
 
     public PeriodState getNextPeriod(int consecutiveFocusPeriods){
         switch (currentPeriod){
-            case FOCUS:
+            case WORK:
                 if (periodsUntilBreak != 0 && consecutiveFocusPeriods >= periodsUntilBreak) return PeriodState.BIG_BREAK;
                 else return PeriodState.BREAK;
             case BREAK:
             case BIG_BREAK:
-                return PeriodState.FOCUS;
+                return PeriodState.WORK;
         }
-        return PeriodState.FOCUS;
+        return PeriodState.WORK;
     }
 
     public int getTimeLeftMillis(PeriodState period){
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         int timeLeft = 0;
         switch (period){
-            case FOCUS:
+            case WORK:
                 timeLeft = sharedPrefs.getInt(getString(R.string.focus_time_minutes_preference_key),
                         Integer.valueOf(getString(R.string.focus_time_minutes_default_value)) );
                 break;
@@ -380,7 +380,7 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
 
     private String getSessionName(PeriodState period){
         switch(period){
-            case FOCUS: return getString(R.string.work_time_text);
+            case WORK: return getString(R.string.work_time_text);
             case BIG_BREAK: return getString(R.string.big_break_text);
             case BREAK: return getString(R.string.break_time_text);
         }
