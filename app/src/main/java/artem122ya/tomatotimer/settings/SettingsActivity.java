@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import artem122ya.tomatotimer.R;
+import artem122ya.tomatotimer.ThemeManager;
 
 
 public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -17,12 +18,14 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        setDarkTheme(sharedPreferences.getBoolean(getString(R.string.dark_mode_preference_key)
-                , false));
+        new ThemeManager(this)
+                .setDarkTheme(R.style.AppThemeDark)
+                .setLightTheme(R.style.AppThemeLight)
+                .applyTheme();
         super.onCreate(savedInstanceState);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         Fragment existingFragment = getFragmentManager().findFragmentById(android.R.id.content);
         if (existingFragment == null) {
@@ -46,9 +49,6 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
         }
     }
 
-    private void setDarkTheme(boolean darkThemeEnabled){
-        setTheme(darkThemeEnabled ? R.style.AppThemeDark : R.style.AppThemeLight);
-    }
 
     @Override
     protected void onResume() {

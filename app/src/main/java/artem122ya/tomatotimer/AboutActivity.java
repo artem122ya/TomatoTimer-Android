@@ -1,5 +1,6 @@
 package artem122ya.tomatotimer;
 
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,10 @@ public class AboutActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        new ThemeManager(this)
+                .setDarkTheme(R.style.AppThemeDark)
+                .setLightTheme(R.style.AppThemeLight)
+                .applyTheme();
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getFragmentManager().beginTransaction().replace(android.R.id.content,
@@ -39,6 +44,13 @@ public class AboutActivity extends AppCompatActivity {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.about);
+            setVersionNumber(findPreference("version"));
+        }
+
+        private void setVersionNumber(Preference preference){
+            String version = BuildConfig.VERSION_NAME;
+            preference.setSummary(version);
+
         }
 
 

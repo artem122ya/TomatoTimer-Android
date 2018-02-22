@@ -44,9 +44,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        setDarkTheme(sharedPreferences.getBoolean(getString(R.string.dark_mode_preference_key),
-                false));
+        new ThemeManager(this)
+                .setDarkTheme(R.style.TimerActivityDark)
+                .setLightTheme(R.style.TimerActivityLight)
+                .applyTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         stopButton.setOnClickListener(this);
         skipButton.setOnClickListener(this);
 
-
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
 
@@ -148,8 +149,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.dark_mode_preference_key))) {
-            setDarkTheme(sharedPreferences.getBoolean(getString(R.string.dark_mode_preference_key)
-                    , false));
             recreate();
         }
     }
@@ -185,9 +184,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void setDarkTheme(boolean darkThemeEnabled){
-        setTheme(darkThemeEnabled ? R.style.TimerActivityDark : R.style.TimerActivityLight);
-    }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
