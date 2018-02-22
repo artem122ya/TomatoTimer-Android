@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             case R.id.about_menu:
+                startActivity(new Intent(this, AboutActivity.class));
                 return true;
         }
         return super.onOptionsItemSelected(item);

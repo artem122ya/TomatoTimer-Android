@@ -25,10 +25,12 @@
             android:enabled="true"
             android:exported="true" />
 
-
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/settings_label" />
+        <activity
+            android:name=".AboutActivity"
+            android:label="@string/about_label" />
     </application>
 
 </manifest>
