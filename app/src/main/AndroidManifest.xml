@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppThemeLight">
         <activity
-            android:name=".MainActivity"
+            android:name=".TimerActivity"
             android:launchMode="singleTask"
             android:theme="@style/TimerActivityLight">
             <intent-filter>

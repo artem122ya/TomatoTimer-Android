@@ -44,4 +44,6 @@
     <string name="one_session_until_big_break_text">Big break coming up next!</string>
     <string name="sessions_until_big_break_text">" work sessions left until big break"</string>
     <string name="about_label">About</string>
+    <string name="about_app_version_title">App Version</string>
+    <string name="about_app_version_key">version</string>
 </resources>

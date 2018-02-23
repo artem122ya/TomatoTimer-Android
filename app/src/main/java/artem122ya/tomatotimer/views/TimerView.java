@@ -15,10 +15,11 @@ import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.View;
 
-import java.util.concurrent.TimeUnit;
 
 import artem122ya.tomatotimer.R;
 import artem122ya.tomatotimer.TimerService.TimerState;
+
+import static artem122ya.tomatotimer.utils.Utils.getTimeString;
 
 
 public class TimerView extends View {
@@ -286,13 +287,6 @@ public class TimerView extends View {
         displayedTime = currentTime;
     }
 
-
-    private String getTimeString(int millis){
-        if (millis < 0) return "00:00";
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
-        return String.format("%02d:%02d",
-                minutes,TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(minutes));
-    }
 
 
     public void onTimerStarted(int millisTotal, int millisLeft){

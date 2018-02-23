@@ -22,9 +22,10 @@ import android.widget.TextView;
 import artem122ya.tomatotimer.TimerService.PeriodState;
 import artem122ya.tomatotimer.TimerService.TimerState;
 import artem122ya.tomatotimer.settings.SettingsActivity;
+import artem122ya.tomatotimer.utils.ThemeManager;
 import artem122ya.tomatotimer.views.TimerView;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener,
+public class TimerActivity extends AppCompatActivity implements View.OnClickListener,
         SharedPreferences.OnSharedPreferenceChangeListener {
 
     private FloatingActionButton startButton;

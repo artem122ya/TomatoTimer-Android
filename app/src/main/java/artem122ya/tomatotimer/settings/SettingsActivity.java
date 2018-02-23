@@ -9,7 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import artem122ya.tomatotimer.R;
-import artem122ya.tomatotimer.ThemeManager;
+import artem122ya.tomatotimer.utils.ThemeManager;
 
 
 public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -30,7 +30,7 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
         Fragment existingFragment = getFragmentManager().findFragmentById(android.R.id.content);
         if (existingFragment == null) {
             getFragmentManager().beginTransaction().replace(android.R.id.content,
-                    new TimerPreferenceFragment()).commit();
+                    new SettingsFragment()).commit();
         }
     }
 

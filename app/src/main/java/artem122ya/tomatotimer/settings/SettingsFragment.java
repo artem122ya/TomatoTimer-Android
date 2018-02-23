@@ -13,7 +13,7 @@ import android.preference.PreferenceManager;
 import artem122ya.tomatotimer.R;
 
 
-public class TimerPreferenceFragment extends PreferenceFragment implements
+public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.OnSharedPreferenceChangeListener {
 
 

@@ -1,9 +1,11 @@
-package artem122ya.tomatotimer;
+package artem122ya.tomatotimer.utils;
 
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
+import artem122ya.tomatotimer.R;
 
 public class ThemeManager{
 

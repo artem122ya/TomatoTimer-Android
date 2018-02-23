@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import artem122ya.tomatotimer.utils.ThemeManager;
+
 public class AboutActivity extends AppCompatActivity {
 
     @Override
@@ -44,10 +46,10 @@ public class AboutActivity extends AppCompatActivity {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.about);
-            setVersionNumber(findPreference("version"));
+            setVersionNumberAsSummary(findPreference(getString(R.string.about_app_version_key)));
         }
 
-        private void setVersionNumber(Preference preference){
+        private void setVersionNumberAsSummary(Preference preference){
             String version = BuildConfig.VERSION_NAME;
             preference.setSummary(version);
 

@@ -13,7 +13,8 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 
-import java.util.concurrent.TimeUnit;
+
+import static artem122ya.tomatotimer.utils.Utils.getTimeString;
 
 public class TimerService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -112,7 +113,7 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
     }
 
     private void initControlIntents(){
-        Intent intentMainActivity = new Intent(this, MainActivity.class);
+        Intent intentMainActivity = new Intent(this, TimerActivity.class);
         intentMainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         openMainActivityIntent = PendingIntent.getActivity(this, 1, intentMainActivity, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -390,13 +391,6 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
 
 
 
-    private String getTimeString(int millis){
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
-        return String.format("%02d:%02d",
-                minutes,TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(minutes));
-    }
-
-
     public PeriodState getCurrentPeriod() {
         return currentPeriod;
     }
@@ -451,19 +445,20 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if(action.equalsIgnoreCase(startActionIntentString)){
-                if(thisTimerService != null) thisTimerService.startTimer();
-            } else if(action.equalsIgnoreCase(pauseActionIntentString)){
-                if(thisTimerService != null) thisTimerService.pauseTimer();
-            } else if(action.equalsIgnoreCase(stopActionIntentString)){
-                if(thisTimerService != null) thisTimerService.onStopButtonClick();
-            } else if(action.equalsIgnoreCase(skipActionIntentString)){
-                if(thisTimerService != null) {
+            if(thisTimerService != null) {
+                String action = intent.getAction();
+                if (action.equalsIgnoreCase(startActionIntentString)) {
+                    thisTimerService.startTimer();
+                } else if (action.equalsIgnoreCase(pauseActionIntentString)) {
+                    thisTimerService.pauseTimer();
+                } else if (action.equalsIgnoreCase(stopActionIntentString)) {
+                    thisTimerService.onStopButtonClick();
+                } else if (action.equalsIgnoreCase(skipActionIntentString)) {
                     thisTimerService.skipPeriod();
                     thisTimerService.startTimer();
                 }
             }
         }
+
     }
 }
