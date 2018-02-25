@@ -29,7 +29,7 @@
             android:name=".settings.SettingsActivity"
             android:label="@string/settings_label" />
         <activity
-            android:name=".AboutActivity"
+            android:name=".about.AboutActivity"
             android:label="@string/about_label" />
     </application>
 

@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import artem122ya.tomatotimer.TimerService.PeriodState;
 import artem122ya.tomatotimer.TimerService.TimerState;
+import artem122ya.tomatotimer.about.AboutActivity;
 import artem122ya.tomatotimer.settings.SettingsActivity;
 import artem122ya.tomatotimer.utils.ThemeManager;
 import artem122ya.tomatotimer.views.TimerView;

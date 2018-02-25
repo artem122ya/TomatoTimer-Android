@@ -1,12 +1,10 @@
-package artem122ya.tomatotimer;
+package artem122ya.tomatotimer.about;
 
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import artem122ya.tomatotimer.R;
 import artem122ya.tomatotimer.utils.ThemeManager;
 
 public class AboutActivity extends AppCompatActivity {
@@ -40,21 +38,4 @@ public class AboutActivity extends AppCompatActivity {
         }
     }
 
-    public static class AboutPreferenceFragment extends PreferenceFragment {
-
-        @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.about);
-            setVersionNumberAsSummary(findPreference(getString(R.string.about_app_version_key)));
-        }
-
-        private void setVersionNumberAsSummary(Preference preference){
-            String version = BuildConfig.VERSION_NAME;
-            preference.setSummary(version);
-
-        }
-
-
-    }
 }

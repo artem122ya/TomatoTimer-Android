@@ -46,4 +46,12 @@
     <string name="about_label">About</string>
     <string name="about_app_version_title">App Version</string>
     <string name="about_app_version_key">version</string>
+    <string name="about_source_code_title">View the source code</string>
+    <string name="about_source_code_key">goToSourceCode</string>
+    <string name="about_source_code_summary">Go to github</string>
+    <string name="about_send_email_title">Send feedback</string>
+    <string name="about_send_email_key">sendEmail</string>
+    <string name="about_send_email_summary">Send email</string>
+    <string name="github_link">https://github.com/artem122ya/TomatoTimer-Android</string>
+    <string name="feedback_email">mailto:help.tomatotimer@gmail.com</string>
 </resources>
