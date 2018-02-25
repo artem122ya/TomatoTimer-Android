@@ -1,5 +1,5 @@
-<vector android:alpha="0.85" android:autoMirrored="true"
+<vector android:autoMirrored="true"
     android:height="100dp" android:viewportHeight="24.0"
     android:viewportWidth="24.0" android:width="100dp" xmlns:android="http://schemas.android.com/apk/res/android">
-    <path android:fillColor="?colorStopSkipButton" android:pathData="M18,18H6V6H18V18Z"/>
+    <path android:fillColor="?colorStartPauseButton" android:pathData="M14,19H18V5H14M6,19H10V5H6V19Z"/>
 </vector>

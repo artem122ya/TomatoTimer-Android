@@ -10,16 +10,6 @@
         <item name="android:alertDialogTheme">@style/DialogTheme</item>
     </style>
 
-    <style name="DialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-
-        <item name="android:windowBackground">?android:colorBackground</item>
-
-
-        <item name="colorControlHighlight">@color/colorPrimary</item>
-    </style>
 
     <style name="AppThemeDark" parent="Theme.AppCompat">
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -30,19 +20,32 @@
 
         <item name="android:alertDialogTheme">@style/DialogTheme</item>
     </style>
+
+
+    <style name="DialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:windowBackground">?android:colorBackground</item>
+
+        <item name="colorControlHighlight">@color/colorPrimary</item>
+    </style>
+    
     
     <style name="TransparentActionBarLight" parent="Theme.AppCompat.Light">
         <item name="colorPrimary">@android:color/transparent</item>
-        <item name="colorPrimaryDark">@color/colorGray</item>
+        <item name="colorPrimaryDark">@color/colorLightGrey</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="windowActionBarOverlay">true</item>
 
-        <item name="colorTimerViewBackgroundArc">@color/colorGray</item>
+        <item name="colorTimerViewBackgroundArc">@color/colorLightGrey</item>
         <item name="colorTimerViewForegroundArc">@color/colorAccent</item>
-        <item name="colorTimerViewText">?android:textColorPrimary</item>
+        <item name="colorTimerViewText">@color/colorDarkGrey</item>
 
-        <item name="colorStopSkipButton">@color/colorBlack</item>
+        <item name="colorStopSkipButton">@color/colorDarkGrey</item>
         <item name="colorStartPauseButton">@color/colorWhite</item>
+        <item name="colorTextView">@color/colorDarkGrey</item>
     </style>
 
     <style name="TransparentActionBarDark" parent="Theme.AppCompat">
@@ -54,10 +57,12 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
 
         <item name="colorTimerViewForegroundArc">@color/colorPrimaryDark</item>
+        <item name="colorTimerViewBackgroundArc">@color/colorDarkGrey</item>
         <item name="colorTimerViewText">?android:textColorPrimary</item>
 
         <item name="colorStopSkipButton">@color/colorWhite</item>
-        <item name="colorStartPauseButton">@color/colorBlack</item>
+        <item name="colorStartPauseButton">?android:colorBackground</item>
+        <item name="colorTextView">@color/colorWhite</item>
     </style>
 
     <style name="WindowAnimationTransition">

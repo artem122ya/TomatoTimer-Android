@@ -22,7 +22,10 @@
         android:layout_gravity="center"
         android:layout_row="0"
         android:layout_columnSpan="3"
-        android:layout_rowWeight="1"/>
+        android:layout_rowWeight="1"
+        android:textColor="?colorTextView"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
 
 
     <ImageButton
@@ -37,7 +40,7 @@
         android:background="?android:selectableItemBackground"
         android:contentDescription="@string/stop_button_content_description"
         android:scaleType="fitXY"
-        app:srcCompat="@drawable/ic_stop_85_opacity" />
+        app:srcCompat="@drawable/ic_stop" />
 
 
     <android.support.design.widget.FloatingActionButton
@@ -54,7 +57,7 @@
         android:focusable="true"
         app:borderWidth="0dp"
         app:elevation="0dp"
-        app:srcCompat="@drawable/ic_play_85_opacity" />
+        app:srcCompat="@drawable/ic_play" />
 
 
     <ImageButton
@@ -68,7 +71,7 @@
         android:background="?android:selectableItemBackground"
         android:contentDescription="@string/skip_button_content_description"
         android:scaleType="fitXY"
-        app:srcCompat="@drawable/ic_skip_next_85_opacity" />
+        app:srcCompat="@drawable/ic_skip_next" />
 
 
     <TextView

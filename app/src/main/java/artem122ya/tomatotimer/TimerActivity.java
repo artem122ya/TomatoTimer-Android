@@ -236,7 +236,7 @@ public class TimerActivity extends AppCompatActivity implements View.OnClickList
     private void setButtonsState(TimerState timerState, int consecutivePeriods){
         switch (timerState){
             case STARTED:
-                startButton.setImageResource(R.drawable.ic_pause_85_opacity);
+                startButton.setImageResource(R.drawable.ic_pause);
                 stopButton.setVisibility(View.VISIBLE);
                 break;
             case STOPPED:
@@ -244,7 +244,7 @@ public class TimerActivity extends AppCompatActivity implements View.OnClickList
                     stopButton.setVisibility(View.INVISIBLE);
                 else  stopButton.setVisibility(View.VISIBLE);
             case PAUSED:
-                startButton.setImageResource(R.drawable.ic_play_85_opacity);
+                startButton.setImageResource(R.drawable.ic_play);
                 break;
         }
     }

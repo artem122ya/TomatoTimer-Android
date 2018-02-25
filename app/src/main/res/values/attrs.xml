@@ -5,5 +5,6 @@
         <attr name="colorTimerViewText" format="color"/>
         <attr name="colorStopSkipButton" format="color"/>
         <attr name="colorStartPauseButton" format="color"/>
+        <attr name="colorTextView" format="color"/>
     </declare-styleable>
 </resources>
