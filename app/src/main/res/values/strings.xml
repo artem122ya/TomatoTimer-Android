@@ -49,7 +49,7 @@
     <string name="about_source_code_title">View the source code</string>
     <string name="about_source_code_key">goToSourceCode</string>
     <string name="about_source_code_summary">Go to github</string>
-    <string name="about_send_email_title">Send feedback</string>
+    <string name="about_send_email_title">Report issue</string>
     <string name="about_send_email_key">sendEmail</string>
     <string name="about_send_email_summary">Send email</string>
     <string name="github_link">https://github.com/artem122ya/TomatoTimer-Android</string>
