@@ -1,4 +1,4 @@
-package artem122ya.tomatotimer.views;
+package artem122ya.tomatotimer.timer;
 
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
@@ -17,7 +17,7 @@ import android.view.View;
 
 
 import artem122ya.tomatotimer.R;
-import artem122ya.tomatotimer.TimerService.TimerState;
+import artem122ya.tomatotimer.timer.TimerService.TimerState;
 
 import static artem122ya.tomatotimer.utils.Utils.getTimeString;
 

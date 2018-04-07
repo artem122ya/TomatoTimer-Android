@@ -11,7 +11,8 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.util.concurrent.TimeoutException;
 
-import artem122ya.tomatotimer.views.TimerView;
+import artem122ya.tomatotimer.timer.TimerService;
+import artem122ya.tomatotimer.timer.TimerView;
 
 import static org.junit.Assert.assertEquals;
 

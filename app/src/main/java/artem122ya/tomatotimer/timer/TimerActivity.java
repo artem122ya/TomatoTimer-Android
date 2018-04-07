@@ -1,16 +1,13 @@
-package artem122ya.tomatotimer;
+package artem122ya.tomatotimer.timer;
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -19,15 +16,13 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import artem122ya.tomatotimer.TimerService.PeriodState;
-import artem122ya.tomatotimer.TimerService.TimerState;
+import artem122ya.tomatotimer.R;
 import artem122ya.tomatotimer.about.AboutActivity;
 import artem122ya.tomatotimer.settings.SettingsActivity;
 import artem122ya.tomatotimer.utils.ThemeManager;
-import artem122ya.tomatotimer.views.TimerView;
 
 public class TimerActivity extends AppCompatActivity implements View.OnClickListener,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        SharedPreferences.OnSharedPreferenceChangeListener, TimerServiceListener {
 
     private FloatingActionButton startButton;
     private ImageButton stopButton, skipButton;
@@ -36,8 +31,8 @@ public class TimerActivity extends AppCompatActivity implements View.OnClickList
 
     private TimerView timerView;
 
-    private TimerState currentTimerState;
-    private PeriodState currentTimerPeriod;
+    private TimerService.TimerState currentTimerState;
+    private TimerService.PeriodState currentTimerPeriod;
     private int consecutivePeriods;
 
     private TextView currentPeriodTextView, periodsUntilBigBreakTextView;
@@ -78,8 +73,6 @@ public class TimerActivity extends AppCompatActivity implements View.OnClickList
     protected void onStart() {
         super.onStart();
         // Bind TimerService.
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
-                new IntentFilter(TimerService.ACTION_SEND_TIME));
         Intent intent = new Intent(this, TimerService.class);
         startService(intent);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
@@ -104,7 +97,6 @@ public class TimerActivity extends AppCompatActivity implements View.OnClickList
     protected void onStop() {
         super.onStop();
         unbindService(serviceConnection);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
 
 
@@ -156,7 +148,7 @@ public class TimerActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void showCurrentStateText(){
-        PeriodState newPeriod = timerService.getCurrentPeriod();
+        TimerService.PeriodState newPeriod = timerService.getCurrentPeriod();
         if (currentTimerPeriod != newPeriod) {
             currentTimerPeriod = newPeriod;
             String currentSession = "";
@@ -187,25 +179,23 @@ public class TimerActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            int timeMillisLeft = intent.getIntExtra(TimerService.INT_TIME_MILLIS_LEFT, 0);
-            int timeMillisTotal = intent.getIntExtra(TimerService.INT_TIME_MILLIS_TOTAL, 0);
-            TimerState timerState = (TimerState) intent.getSerializableExtra(TimerService.ENUM_TIMER_STATE);
+    public void onTimeChange(final int totalMillis, final int millisLeft, final TimerService.TimerState timerState) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                setPeriodCounter();
 
-            setPeriodCounter();
+                showCurrentStateText();
 
-            showCurrentStateText();
+                updateButtons(timerState, timerService.getConsecutiveWorkPeriods());
 
-            updateButtons(timerState, timerService.getConsecutiveWorkPeriods());
-
-            updateTimerView(timerState, timeMillisTotal, timeMillisLeft);
-
-        }
-    };
+                updateTimerView(timerState, totalMillis, millisLeft);
+            }
+        });
+    }
 
 
-    private void updateTimerView(TimerState currentTimerState, int millisTotal, int millisLeft){
+    private void updateTimerView(TimerService.TimerState currentTimerState, int millisTotal, int millisLeft){
         switch (currentTimerState){
             case STARTED:
                 timerView.onTimerStarted(millisTotal, millisLeft);
@@ -226,7 +216,7 @@ public class TimerActivity extends AppCompatActivity implements View.OnClickList
         updateTimerView(timerService.getCurrentTimerState(), timerService.getMillisTotal(), timerService.getMillisLeft());
     }
 
-    public void updateButtons(TimerState timerState, int currentConsecutivePeriods){
+    public void updateButtons(TimerService.TimerState timerState, int currentConsecutivePeriods){
         if (currentTimerState != timerState || consecutivePeriods != currentConsecutivePeriods){
             setButtonsState(timerState, currentConsecutivePeriods);
             currentTimerState = timerState;
@@ -234,7 +224,7 @@ public class TimerActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void setButtonsState(TimerState timerState, int consecutivePeriods){
+    private void setButtonsState(TimerService.TimerState timerState, int consecutivePeriods){
         switch (timerState){
             case STARTED:
                 startButton.setImageResource(R.drawable.ic_pause);
@@ -255,6 +245,7 @@ public class TimerActivity extends AppCompatActivity implements View.OnClickList
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             timerService = ((TimerService.LocalBinder) iBinder).getService();
+            timerService.registerTimerListener(TimerActivity.this);
             updateButtons(timerService.getCurrentTimerState(), timerService.getConsecutiveWorkPeriods());
             initializeTimerView();
             showCurrentStateText();
@@ -263,7 +254,9 @@ public class TimerActivity extends AppCompatActivity implements View.OnClickList
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
+            timerService.unregisterTimerListener();
         }
     };
+
 
 }

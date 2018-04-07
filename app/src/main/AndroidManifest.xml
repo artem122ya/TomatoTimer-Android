@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppThemeLight">
         <activity
-            android:name=".TimerActivity"
+            android:name=".timer.TimerActivity"
             android:launchMode="singleTask"
             android:theme="@style/TimerActivityLight">
             <intent-filter>
@@ -21,7 +21,7 @@
         </activity>
 
         <service
-            android:name=".TimerService"
+            android:name=".timer.TimerService"
             android:enabled="true"
             android:exported="true" />
 

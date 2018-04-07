@@ -1,4 +1,4 @@
-package artem122ya.tomatotimer;
+package artem122ya.tomatotimer.timer;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -11,8 +11,9 @@ import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
 
+
+import artem122ya.tomatotimer.R;
 
 import static artem122ya.tomatotimer.utils.Utils.getTimeString;
 
@@ -61,6 +62,9 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
             openMainActivityIntent, skipActionIntent;
 
     SharedPreferences sharedPreferences;
+
+
+    private TimerServiceListener serviceListener;
 
 
     public class LocalBinder extends Binder {
@@ -282,13 +286,17 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
 
 
     private void sendTime(int totalMillis, int millisLeft){
-        /* Method sends total time and time left in milliseconds */
-        Intent intent = new Intent(ACTION_SEND_TIME);
-        intent.putExtra(ENUM_TIMER_STATE, timerState);
-        intent.putExtra(INT_TIME_MILLIS_LEFT, millisLeft);
-        intent.putExtra(INT_TIME_MILLIS_TOTAL, totalMillis);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        if (serviceListener != null) serviceListener.onTimeChange(totalMillis, millisLeft, timerState);
     }
+
+    public void registerTimerListener(TimerServiceListener listener){
+        serviceListener = listener;
+    }
+
+    public void unregisterTimerListener(){
+        serviceListener = null;
+    }
+
 
     public int getMillisLeft(){
         if (timerState == TimerState.STOPPED) {

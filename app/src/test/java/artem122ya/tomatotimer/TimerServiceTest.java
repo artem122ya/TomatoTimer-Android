@@ -8,6 +8,8 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.util.concurrent.TimeoutException;
 
+import artem122ya.tomatotimer.timer.TimerService;
+
 import static org.junit.Assert.assertEquals;
 
 
