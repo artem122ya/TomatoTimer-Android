@@ -1,28 +1,72 @@
 package artem122ya.tomatotimer.timer;
 
 
+import artem122ya.tomatotimer.timer.Timer.TimerState;
 
 public interface TimerContract {
 
-    interface TimerServiceListener {
+    interface Timer {
 
-        void onTimerStart(int totalMillis);
+        void registerListener(TimerListener timerListener);
 
-        void onTimerPause(int totalMillis, int millisLeft);
+        void unregisterListener();
 
-        void onTimerTick(int totalMillis, int millisLeft);
+        void startTimer(int milliseconds);
 
-        void onTimerStop(int totalMillis);
+        void stopTimer();
 
-        void onPeriodsCountChange(int periodsLeft);
+        void pauseTimer();
 
-        void onPeriodStateChange(TimerService.PeriodState state);
+        void resumeTimer();
+
+        TimerState getTimerState();
+
+    }
+
+    interface TimerListener {
+
+        void onTimerFinish();
+
+        void onTimerTick(int millisecondsLeft);
+
+    }
+
+    interface TimerSevice {
+
+    }
+
+    interface TimerNotificationManager {
 
     }
 
     interface TimerPresenter {
 
+        void onTimerStart(int millisecondsTotal);
+
+        void onTimerPause(int millisecondsTotal, int millisLeft);
+
+        void onTimerTick(int millisecondsTotal, int millisLeft);
+
+        void onTimerStop(int millisecondsTotal);
+
+        void onPeriodsCountChange(int periodsLeft);
+
+        void onPeriodStateChange(TimerService.PeriodState state);
+
+        void onTimeChange(int millisecondsTotal, int millisLeft, TimerService.TimerState timerState);
+
     }
+
+    interface TimerActivity {
+
+    }
+
+
+
+
+
+
+
 
 
 }
