@@ -1,6 +1,8 @@
 package artem122ya.tomatotimer.timer;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -8,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -33,6 +36,9 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
     private final Object timerThreadLock = new Object();
 
     int timerNotificationId = 135001;
+    String timerControlsNotificationChannelId = "artem122ya.tomatotimer.timer_controls";
+    String timerFinishedNotificationChannelId = "artem122ya.tomatotimer.timer_finished";
+
 
     private WorkTimerActionReceiver actionReceiver = new WorkTimerActionReceiver();
 
@@ -133,6 +139,21 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
         Intent skipIntent = new Intent(skipActionIntentString);
         skipActionIntent = PendingIntent.getBroadcast(this, 100, skipIntent, 0);
 
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationChannel timerControlsNotificationChannel = new NotificationChannel(timerControlsNotificationChannelId,
+                    "Timer controls", NotificationManager.IMPORTANCE_LOW);
+            timerControlsNotificationChannel.setDescription("Pause, Resume os Stop timer with notification");
+            notificationManager.createNotificationChannel(timerControlsNotificationChannel);
+
+            NotificationChannel timerFinishNotificationChannel = new NotificationChannel(timerFinishedNotificationChannelId,
+                    "Timer Finish Notification", NotificationManager.IMPORTANCE_HIGH);
+            timerFinishNotificationChannel.setDescription("Get notified when cycle ends");
+            timerFinishNotificationChannel.setLightColor(Color.RED);
+            timerFinishNotificationChannel.enableVibration(true);
+            notificationManager.createNotificationChannel(timerFinishNotificationChannel);
+        }
     }
 
     @Override
@@ -339,6 +360,9 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
                         .setVisibility(Notification.VISIBILITY_PUBLIC)
                         .setPriority(Notification.PRIORITY_MAX)
                         .setCategory(Notification.CATEGORY_ALARM);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            builder.setChannelId(timerControlsNotificationChannelId);
+        }
 
         startForeground(timerNotificationId, builder.build());
     }
@@ -360,6 +384,10 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
                         .setVisibility(Notification.VISIBILITY_PUBLIC)
                         .setPriority(Notification.PRIORITY_MAX)
                         .setCategory(Notification.CATEGORY_ALARM);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            builder.setChannelId(timerControlsNotificationChannelId);
+        }
 
         startForeground(timerNotificationId, builder.build());
     }
@@ -383,6 +411,11 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
                         .setDefaults(Notification.DEFAULT_ALL)
                         .setPriority(Notification.PRIORITY_MAX)
                         .setCategory(Notification.CATEGORY_ALARM);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            builder.setChannelId(timerFinishedNotificationChannelId);
+        }
+
 
         startForeground(timerNotificationId, builder.build());
     }
