@@ -1,0 +1,57 @@
+<resources>
+    <string name="app_name">番茄钟</string>
+    <string name="menu_option_settings">设置</string>
+    <string name="menu_option_about">关于</string>
+    <string name="settings_label">设置</string>
+    <string name="work_minute_picker_title">工作单组时长</string>
+    <string name="small_break_minute_picker_title">小憩时长</string>
+    <string name="big_break_minute_picker_title">休息时长</string>
+    <string name="timer_preference_category_title">计时器</string>
+    <string name="work_minute_picker_summary">00 分钟</string>
+    <string name="small_break_minute_picker_summary">00 分钟</string>
+    <string name="big_break_minute_picker_summary">00 分钟</string>
+    <string name="sessions_until_big_break_title">工作多组直到休息时长</string>
+    <string name="sessions_until_big_break_summary">00 组</string>
+    <string name="stop_button_content_description">停止按钮</string>
+    <string name="start_and_pause_button_content_description">开始或停止按钮</string>
+    <string name="skip_button_content_description">跳过按钮</string>
+    <string name="work_time_text">工作组</string>
+    <string name="break_time_text">暂停</string>
+    <string name="notification_text">" 分钟剩余"</string>
+    <string name="start_notification_action_title">开始</string>
+    <string name="pause_notification_action_title">暂停</string>
+    <string name="skip_notification_action_title">跳过</string>
+    <string name="stop_notification_action_title">停止</string>
+    <string name="resume_notification_action_title">恢复</string>
+    <string name="big_break_text">休息</string>
+    <string name="finished_notification_title">" 结束"</string>
+    <string name="finished_notification_text">"想要启动一个 "</string>
+    <string name="work_time_minutes_default_value">25</string>
+    <string name="small_break_time_minutes_default_value">5</string>
+    <string name="big_break_time_minutes_default_value">15</string>
+    <string name="sessions_until_big_break_default_value">4</string>
+    <string name="number_picker_dialog_positive_button_text">确定</string>
+    <string name="number_picker_dialog_negative_button_text">取消</string>
+    <string name="theme_preference_category_title">主题</string>
+    <string name="dark_mode_title">启用夜间模式</string>
+
+    <string name="work_time_minutes_preference_key">work_time_minutes</string>
+    <string name="small_break_time_minutes_preference_key">small_break_time_minutes</string>
+    <string name="big_break_time_minutes_preference_key">big_break_time_minutes</string>
+    <string name="sessions_until_big_break_preference_key">sessions_until_big_break</string>
+    <string name="dark_mode_preference_key">dark_mode</string>
+
+    <string name="one_session_until_big_break_text">这组工作完就休息啦！</string>
+    <string name="sessions_until_big_break_text">" 组工作后就可休息"</string>
+    <string name="about_label">关于</string>
+    <string name="about_app_version_title">App 版本</string>
+    <string name="about_app_version_key">版本</string>
+    <string name="about_source_code_title">查看源码</string>
+    <string name="about_source_code_key">goToSourceCode</string>
+    <string name="about_source_code_summary">访问Github仓库</string>
+    <string name="about_send_email_title">上报问题</string>
+    <string name="about_send_email_key">sendEmail</string>
+    <string name="about_send_email_summary">给作者发送邮件</string>
+    <string name="github_link">https://github.com/artem122ya/TomatoTimer-Android</string>
+    <string name="feedback_email">mailto:help.tomatotimer@gmail.com</string>
+</resources>
