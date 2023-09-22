@@ -49,9 +49,13 @@
     <string name="about_source_code_title">View the source code</string>
     <string name="about_source_code_key">goToSourceCode</string>
     <string name="about_source_code_summary">Go to github</string>
+    <string name="about_original_source_code_title">View the original source code</string>
+    <string name="about_original_source_code_key">goToOriginalSourceCode</string>
+    <string name="about_original_source_code_summary">Go to original github(v1.0.1)</string>
     <string name="about_send_email_title">Report issue</string>
     <string name="about_send_email_key">sendEmail</string>
-    <string name="about_send_email_summary">Send email</string>
-    <string name="github_link">https://github.com/artem122ya/TomatoTimer-Android</string>
+    <string name="about_send_email_summary">Send email to original author</string>
+    <string name="github_link">https://github.com/ruin1990/TomatoTimer-Android</string>
+    <string name="original_github_link">https://github.com/artem122ya/TomatoTimer-Android</string>
     <string name="feedback_email">mailto:help.tomatotimer@gmail.com</string>
 </resources>

@@ -46,12 +46,16 @@
     <string name="about_label">关于</string>
     <string name="about_app_version_title">App 版本</string>
     <string name="about_app_version_key">版本</string>
-    <string name="about_source_code_title">查看源码</string>
+    <string name="about_source_code_title">查看汉化版源码</string>
     <string name="about_source_code_key">goToSourceCode</string>
-    <string name="about_source_code_summary">访问Github仓库</string>
+    <string name="about_source_code_summary">访问汉化版Github仓库</string>
+    <string name="about_original_source_code_title">查看原版源码</string>
+    <string name="about_original_source_code_key">goToOriginalSourceCode</string>
+    <string name="about_original_source_code_summary">访问原版github仓库(v1.0.1)</string>
     <string name="about_send_email_title">上报问题</string>
     <string name="about_send_email_key">sendEmail</string>
-    <string name="about_send_email_summary">给作者发送邮件</string>
-    <string name="github_link">https://github.com/artem122ya/TomatoTimer-Android</string>
+    <string name="about_send_email_summary">给原版作者发送邮件</string>
+    <string name="github_link">https://github.com/ruin1990/TomatoTimer-Android</string>
+    <string name="original_github_link">https://github.com/artem122ya/TomatoTimer-Android</string>
     <string name="feedback_email">mailto:help.tomatotimer@gmail.com</string>
 </resources>
