@@ -5,7 +5,8 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.drawable.ColorDrawable;
 import android.preference.DialogPreference;
-import android.support.v4.content.ContextCompat;
+
+
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.NumberPicker;
 
+import androidx.core.content.ContextCompat;
 import artem122ya.tomatotimer.R;
 
 public class NumberPickerDialogPreference extends DialogPreference {
