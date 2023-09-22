@@ -1,5 +1,6 @@
 package artem122ya.tomatotimer.timer;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -10,18 +11,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import artem122ya.tomatotimer.R;
 
 import static artem122ya.tomatotimer.utils.Utils.getTimeString;
 
 public class TimerService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private static final int REQUEST_FOREGROUND_PERMISSION = 200;
     public static String ACTION_SEND_TIME = "artem122ya.tomatotimer.time_send";
     public static String INT_TIME_MILLIS_LEFT = "artem122ya.tomatotimer.time_extra_millis_left";
     public static String INT_TIME_MILLIS_TOTAL = "artem122ya.tomatotimer.time_extra_millis_total";
@@ -102,6 +107,14 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         checkNumberOfSessionsUntilBreak(sharedPreferences);
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.FOREGROUND_SERVICE) == PackageManager.PERMISSION_GRANTED) {
+            // 在这里启动前台服务
+        } else {
+            // 如果没有获得权限，可以请求权限
+            //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.FOREGROUND_SERVICE}, REQUEST_FOREGROUND_PERMISSION);
+        }
+
     }
 
     @Override
@@ -125,19 +138,19 @@ public class TimerService extends Service implements SharedPreferences.OnSharedP
     private void initControlIntents(){
         Intent intentMainActivity = new Intent(this, TimerActivity.class);
         intentMainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        openMainActivityIntent = PendingIntent.getActivity(this, 1, intentMainActivity, PendingIntent.FLAG_UPDATE_CURRENT);
+        openMainActivityIntent = PendingIntent.getActivity(this, 1, intentMainActivity, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         Intent startIntent = new Intent(startActionIntentString);
-        startActionIntent = PendingIntent.getBroadcast(this, 100, startIntent, 0);
+        startActionIntent = PendingIntent.getBroadcast(this, 100, startIntent, PendingIntent.FLAG_IMMUTABLE);
 
         Intent pauseIntent = new Intent(pauseActionIntentString);
-        pauseActionIntent = PendingIntent.getBroadcast(this, 100, pauseIntent, 0);
+        pauseActionIntent = PendingIntent.getBroadcast(this, 100, pauseIntent, PendingIntent.FLAG_IMMUTABLE);
 
         Intent stopIntent = new Intent(stopActionIntentString);
-        stopActionIntent = PendingIntent.getBroadcast(this, 100, stopIntent, 0);
+        stopActionIntent = PendingIntent.getBroadcast(this, 100, stopIntent, PendingIntent.FLAG_IMMUTABLE);
 
         Intent skipIntent = new Intent(skipActionIntentString);
-        skipActionIntent = PendingIntent.getBroadcast(this, 100, skipIntent, 0);
+        skipActionIntent = PendingIntent.getBroadcast(this, 100, skipIntent, PendingIntent.FLAG_IMMUTABLE);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationManager notificationManager =

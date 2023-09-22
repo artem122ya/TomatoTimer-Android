@@ -7,9 +7,8 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
-import android.support.annotation.Nullable;
-import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import artem122ya.tomatotimer.BuildConfig;
 import artem122ya.tomatotimer.R;
 
